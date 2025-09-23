@@ -12,7 +12,7 @@ export const Header: React.FC<HeaderProps> = ({ user, isLoggedIn }) => {
     <header className="header">
       <div className="header-container">
         <div className="header-left">
-          <h1 className="header-logo">ジモトデ</h1>
+          <h1 className="header-logo">  ジモトデ</h1>
           <nav className="header-nav">
             <a href="#" className="nav-link active">{/* 任意のナビゲーション */}</a>
           </nav>
