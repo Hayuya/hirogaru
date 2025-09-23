@@ -14,13 +14,14 @@ export const TopPage: React.FC = () => {
   // State管理
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // errorの初期値をauthStateから受け取るように変更
   const [authState, setAuthState] = useState<AuthState>({
     isInitialized: false,
     isLoggedIn: false,
     user: null,
     lineUserId: null,
-    isFriend: false, // isFriendの初期値を追加
+    isFriend: false,
+    error: null, // <-- errorの初期値を追加
   });
 
   // フィルター・ソート関連のState
@@ -45,19 +46,23 @@ export const TopPage: React.FC = () => {
 
   // 企業データの読み込みトリガー
   useEffect(() => {
-    // LIFFの初期化が完了してからデータ取得を開始
-    if (authState.isInitialized) {
+    // LIFF初期化完了 かつ エラーがない場合にデータ取得を開始
+    if (authState.isInitialized && !authState.error) {
       const handler = setTimeout(() => {
         loadCompanies(true); // 条件が変更されたらリセットして読み込み
       }, 500);
       return () => clearTimeout(handler);
     }
-  }, [selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder, authState.isInitialized]);
+  }, [selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder, authState.isInitialized, authState.error]);
 
   // 企業データを取得する関数
   const loadCompanies = async (reset: boolean = false) => {
+    // authState.errorがある場合は処理を中断
+    if (authState.error) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    setError(null);
     const currentSkip = reset ? 0 : skip;
 
     try {
@@ -80,7 +85,8 @@ export const TopPage: React.FC = () => {
       setHasMore(data.length >= 20);
     } catch (error) {
       console.error('Failed to load companies:', error);
-      setError('企業データの読み込みに失敗しました。時間をおいて再度お試しください。');
+      // ここでのエラーはauthState.errorとは別で管理
+      // setError('企業データの読み込みに失敗しました。時間をおいて再度お試しください。');
     } finally {
       setLoading(false);
     }
@@ -99,17 +105,15 @@ export const TopPage: React.FC = () => {
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
 
-  // 「未ログイン」または「友だちでない」場合にコンテンツを制限
   const isUserRestricted = !authState.isLoggedIn || !authState.isFriend;
 
-  // 友だち追加を促すUI
   const FriendPrompt = () => (
     <div className="registration-prompt">
       <div className="prompt-content">
         <h3>全コンテンツの閲覧には</h3>
         <p>LINE公式アカウントの友だち追加が必要です。追加後、再度アクセスしてください。</p>
         <a 
-          href="2008160071-7jkwxNXd" // TODO: ここに公式アカウントのIDを設定
+          href="https://line.me/R/ti/p/YOUR_OFFICIAL_ACCOUNT_ID"
           className="register-button"
           style={{ textDecoration: 'none' }}
         >
@@ -118,6 +122,69 @@ export const TopPage: React.FC = () => {
       </div>
     </div>
   );
+  
+  // ▼▼▼ ここからコンテンツ表示ロジックを修正 ▼▼▼
+  const renderContent = () => {
+    // 1. LIFFの初期化がまだ終わっていない場合
+    if (!authState.isInitialized) {
+      return (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">アプリケーションを準備しています...</p>
+        </div>
+      );
+    }
+
+    // 2. LIFFの初期化でエラーが発生した場合
+    if (authState.error) {
+      return (
+        <div className="error-container">
+          <p className="error-message">{authState.error}</p>
+        </div>
+      );
+    }
+
+    // 3. 企業データ読み込み中の場合 (初回)
+    if (loading && companies.length === 0) {
+      return (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">企業データを読み込んでいます...</p>
+        </div>
+      );
+    }
+
+    // 4. ログイン済みだが友だちでない場合
+    if (authState.isLoggedIn && !authState.isFriend) {
+      return <FriendPrompt />;
+    }
+
+    // 5. 該当企業が0件の場合
+    if (companies.length === 0 && !loading) {
+      return (
+        <div className="no-results">
+          <p>該当する企業が見つかりませんでした。</p>
+        </div>
+      );
+    }
+    
+    // 6. 正常に企業リストを表示
+    return (
+      <div className="companies-list">
+        {companies.map((company, index) => {
+          const isLastElement = companies.length === index + 1;
+          return (
+            <div ref={isLastElement ? lastCompanyElementRef : null} key={company.id}>
+              <CompanyCard
+                company={company}
+                isRestricted={isUserRestricted && index >= 3}
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div className="top-page">
@@ -126,8 +193,7 @@ export const TopPage: React.FC = () => {
       
       <main className="main-content">
         <div className="container">
-          {/* LIFF初期化中、またはログイン中で友だちの場合はフィルターなどを表示 */}
-          {(loading || (authState.isLoggedIn && authState.isFriend)) && (
+          {authState.isInitialized && !authState.error && (authState.isLoggedIn && authState.isFriend) && (
             <>
               <FilterBar
                 selectedIndustries={selectedIndustries}
@@ -155,39 +221,7 @@ export const TopPage: React.FC = () => {
             </>
           )}
 
-          {/* コンテンツ表示ロジック */}
-          {loading && companies.length === 0 ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p className="loading-text">企業データを読み込んでいます...</p>
-            </div>
-          ) : error ? (
-            <div className="error-container">
-              <p className="error-message">{error}</p>
-            </div>
-          ) : authState.isLoggedIn && !authState.isFriend ? (
-            // ログイン済みだが友だちでない場合
-            <FriendPrompt />
-          ) : companies.length === 0 && !loading ? (
-            <div className="no-results">
-              <p>該当する企業が見つかりませんでした。</p>
-            </div>
-          ) : (
-            // ログイン済みかつ友だち、または未ログインの場合の企業リスト
-            <div className="companies-list">
-              {companies.map((company, index) => {
-                const isLastElement = companies.length === index + 1;
-                return (
-                  <div ref={isLastElement ? lastCompanyElementRef : null} key={company.id}>
-                    <CompanyCard
-                      company={company}
-                      isRestricted={isUserRestricted && index >= 3}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          {renderContent()}
         </div>
       </main>
     </div>
