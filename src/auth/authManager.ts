@@ -13,10 +13,10 @@ class AuthManager {
     isFriend: false,
     error: null,
   };
-  
-  // セッション内でのトラッキング重複を防ぐフラグをクラス変数に変更
-  private isActionLogged = false;
 
+  private isActionLogged = false; // アクションログが送信済みか管理するフラグ
+
+  // 初期化処理を一度だけ実行することを保証する
   async initialize(): Promise<AuthState> {
     if (this.authState.isInitialized) {
       return this.authState;
@@ -39,38 +39,30 @@ class AuthManager {
           liff.getFriendship(),
         ]);
 
-        this.authState.user = {
-          userId: profile.userId,
-          displayName: profile.displayName,
-          pictureUrl: profile.pictureUrl,
-        };
+        this.authState.user = profile;
         this.authState.lineUserId = profile.userId;
+        this.authState.isFriend = friendship.friendFlag;
 
         // ユーザーIDが取得でき、かつまだログが送信されていなければ実行
         if (profile.userId && !this.isActionLogged) {
-          // トラッキングAPIを呼び出す
+          // awaitをつけず非同期で実行し、UI表示をブロックしない
           logLineAction({
             lineUserId: profile.userId,
             actionName: 'RichMenuClick',
           });
-          // 送信済みフラグを立てる
-          this.isActionLogged = true;
+          this.isActionLogged = true; // 送信済みフラグを立てる
         }
-
-        this.authState.isFriend = friendship.friendFlag;
-        
-      } else {
-        this.authState.isLoggedIn = false;
       }
     } catch (error) {
-      console.error('LIFF Error: 初期化または情報取得に失敗しました。', error);
+      console.error('LIFF Error:', error);
       this.authState.error = 'LIFFの初期化に失敗しました。時間をおいて再度お試しください。';
     } finally {
-      this.authState.isInitialized = true;
+      this.authState.isInitialized = true; // 成功・失敗に関わらず初期化完了とする
     }
     
     return this.authState;
   }
 }
 
+// シングルトンインスタンスとしてエクスポート
 export const authManager = new AuthManager();
