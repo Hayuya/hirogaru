@@ -1,8 +1,11 @@
 import liff from '@line/liff';
 import type { AuthState } from '../types/auth';
-import { logLineAction } from '../api/lineActionApi'; // 作成したAPI関数をインポート
+import { logLineAction } from '../api/lineActionApi';
 
 const LIFF_ID = import.meta.env.VITE_LIFF_ID;
+
+// セッション内でトラッキングが一度だけ実行されたか管理するフラグ
+let isActionLogged = false;
 
 class AuthManager {
   private authState: AuthState = {
@@ -13,9 +16,13 @@ class AuthManager {
     isFriend: false,
     error: null,
   };
-  private hasLoggedRichMenuClick = false;
 
   async initialize(): Promise<AuthState> {
+    // 既に初期化済みの場合は、現在の状態をそのまま返す
+    if (this.authState.isInitialized) {
+      return this.authState;
+    }
+
     if (!LIFF_ID) {
       console.error('LIFF Error: VITE_LIFF_IDが設定されていません。');
       this.authState.error = 'LIFF IDが設定されていません。';
@@ -41,20 +48,22 @@ class AuthManager {
         };
         this.authState.lineUserId = profile.userId;
 
-        // RichMenuClickアクションを初回アクセス時に記録
-        if (!this.hasLoggedRichMenuClick) {
-          this.hasLoggedRichMenuClick = true;
-          void logLineAction({
+        // ▼▼▼ ここから修正 ▼▼▼
+        // セッション内で一度もログが送信されていなければ、トラッキングAPIを呼び出す
+        if (profile.userId && !isActionLogged) {
+          // ログ送信処理を実行
+          logLineAction({
             lineUserId: profile.userId,
             actionName: 'RichMenuClick',
           });
+          // 送信済みフラグを立てる
+          isActionLogged = true;
         }
+        // ▲▲▲ ここまで修正 ▲▲▲
 
         if (friendship.friendFlag) {
-          console.log('✅ ユーザーは公式アカウントの友だちです。');
           this.authState.isFriend = true;
         } else {
-          console.log('ユーザーはまだ友だちではありません。');
           this.authState.isFriend = false;
         }
         
