@@ -8,7 +8,6 @@ import type { Company, SortOption } from '../types/company';
 import { fetchCompanies } from '../api/companyApi';
 import { authManager } from '../auth/authManager';
 import type { AuthState } from '../types/auth';
-import { axiosClient } from '../api/axiosClient'; // axiosClientを直接利用するためにインポート
 import './TopPage.css';
 
 export const TopPage: React.FC = () => {
@@ -26,16 +25,13 @@ export const TopPage: React.FC = () => {
   // フィルター・ソート関連のState
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [femaleRatioFilter, setFemaleRatioFilter] = useState(false);
-  const [relocationFilter, setRelocationFilter] = useState(false);
-  const [specialLeaveFilter, setSpecialLeaveFilter] = useState(false);
-  const [housingAllowanceFilter, setHousingAllowanceFilter] = useState(false);
+  const [relocationFilter, setRelocationFilter] = useState(false); // 転勤なしフィルター
+  const [specialLeaveFilter, setSpecialLeaveFilter] = useState(false); // 特別休暇フィルター
+  const [housingAllowanceFilter, setHousingAllowanceFilter] = useState(false); // 住宅手当フィルター
   const [currentSort, setCurrentSort] = useState<SortOption>('starting_salary_graduates');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  
-  // 開発用の全件ランダム表示モードかどうかを管理するState
-  const [isDevRandomMode, setIsDevRandomMode] = useState(false);
 
   // LIFF初期化
   useEffect(() => {
@@ -50,27 +46,31 @@ export const TopPage: React.FC = () => {
     initLiff();
   }, []);
 
-  // 企業データの初回・フィルター変更時読み込み
+  // 企業データの初回読み込み（デバウンス適用）
   useEffect(() => {
-    // 開発用モードが有効な場合は、このeffectを実行しない
-    if (isDevRandomMode) return;
-
+    // 500msのデバウンス処理
     const handler = setTimeout(() => {
-      loadCompanies(true); // フィルターやソートが変更されたらリセットして読み込み
+      loadCompanies(true); // フィルター変更時はリセットする
     }, 500);
 
-    return () => clearTimeout(handler);
-  }, [selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder, authState.lineUserId, isDevRandomMode]);
+    // クリーンアップ関数でタイマーをクリア
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder, authState.lineUserId]);
 
-  // 通常のデータ読み込み（ページネーション対応）
   const loadCompanies = async (reset: boolean = false) => {
     setLoading(true);
     setError(null);
-    const currentSkip = reset ? 0 : skip;
+    if (reset) {
+      setCompanies([]);
+      setSkip(0);
+      setHasMore(true);
+    }
 
     try {
       const params = {
-        skip: currentSkip,
+        skip: reset ? 0 : skip,
         limit: 20,
         line_user_id: authState.lineUserId,
         sort: currentSort,
@@ -83,80 +83,49 @@ export const TopPage: React.FC = () => {
       };
 
       const data = await fetchCompanies(params);
-      setCompanies(prev => (reset ? data : [...prev, ...data]));
-      setSkip(currentSkip + data.length);
+      if (reset) {
+        setCompanies(data);
+      } else {
+        setCompanies(prev => [...prev, ...data]);
+      }
+      setSkip(prev => (reset ? data.length : prev + data.length));
       setHasMore(data.length >= 20);
     } catch (error) {
       console.error('Failed to load companies:', error);
-      setError('企業データの読み込みに失敗しました。');
+      setError('企業データの読み込みに失敗しました。しばらくしてから再度お試しください。');
     } finally {
       setLoading(false);
     }
   };
-  
-  // 【開発用】全件取得してシャッフルする関数
-  const handleFetchAndShuffleAll = async () => {
-    setLoading(true);
-    setError(null);
-    setIsDevRandomMode(true); // 開発用モードに設定
-    setHasMore(false); // 無限スクロールを停止
 
-    try {
-      // 既存のaxiosClientを使って直接APIを叩く
-      const response = await axiosClient.get<Company[]>('/companies');
-      const allCompanies = response.data;
-      
-      // 配列をシャッフル (Fisher-Yates algorithm)
-      for (let i = allCompanies.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allCompanies[i], allCompanies[j]] = [allCompanies[j], allCompanies[i]];
-      }
-      
-      setCompanies(allCompanies);
-    } catch (e) {
-      console.error('Failed to fetch all companies for dev:', e);
-      setError('全件取得に失敗しました。');
-    } finally {
-      setLoading(false);
-    }
+  // 無限スクロールによる追加読み込み
+  const loadMoreCompanies = () => {
+    if (loading || !hasMore) return;
+    loadCompanies(false);
   };
   
-  // 通常モードに戻すための共通処理
-  const switchToNormalMode = (callback: Function) => {
-    setIsDevRandomMode(false);
-    callback();
+  const handleSortChange = (sort: SortOption, order: 'asc' | 'desc') => {
+    setCurrentSort(sort);
+    setSortOrder(order);
   };
 
   // Intersection Observer の設定
   const observer = useRef<IntersectionObserver>();
   const lastCompanyElementRef = useCallback((node: HTMLDivElement | null) => {
-    if (loading || isDevRandomMode) return; // 開発モード中は無限スクロールしない
+    if (loading) return;
     if (observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore) {
-        loadCompanies(false); // 追加読み込み
+        loadMoreCompanies();
       }
     });
 
     if (node) observer.current.observe(node);
-  }, [loading, hasMore, isDevRandomMode]);
+  }, [loading, hasMore]);
+
 
   const isUserRestricted = !authState.isLoggedIn || !authState.lineUserId;
-  
-  const devButtonStyle: React.CSSProperties = {
-    padding: '8px 16px',
-    background: '#ffc107',
-    color: 'black',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginBottom: '16px',
-    fontWeight: 'bold',
-    display: 'block',
-    width: '100%',
-    textAlign: 'center',
-  };
 
   return (
     <div className="top-page">
@@ -165,32 +134,25 @@ export const TopPage: React.FC = () => {
       
       <main className="main-content">
         <div className="container">
-          <button style={devButtonStyle} onClick={handleFetchAndShuffleAll}>
-            【開発用】全件取得してランダム表示
-          </button>
-
           <FilterBar
             selectedIndustries={selectedIndustries}
             femaleRatioFilter={femaleRatioFilter}
             relocationFilter={relocationFilter}
             specialLeaveFilter={specialLeaveFilter}
             housingAllowanceFilter={housingAllowanceFilter}
-            onIndustryChange={(industries) => switchToNormalMode(() => setSelectedIndustries(industries))}
-            onFemaleRatioChange={(checked) => switchToNormalMode(() => setFemaleRatioFilter(checked))}
-            onRelocationChange={(checked) => switchToNormalMode(() => setRelocationFilter(checked))}
-            onSpecialLeaveChange={(checked) => switchToNormalMode(() => setSpecialLeaveFilter(checked))}
-            onHousingAllowanceChange={(checked) => switchToNormalMode(() => setHousingAllowanceFilter(checked))}
+            onIndustryChange={setSelectedIndustries}
+            onFemaleRatioChange={setFemaleRatioFilter}
+            onRelocationChange={setRelocationFilter}
+            onSpecialLeaveChange={setSpecialLeaveFilter}
+            onHousingAllowanceChange={setHousingAllowanceFilter}
           />
           
           {companies.length > 0 && (
             <SortBar
               currentSort={currentSort}
               sortOrder={sortOrder}
-              totalCount={companies.length}
-              onSortChange={(sort, order) => switchToNormalMode(() => {
-                setCurrentSort(sort);
-                setSortOrder(order);
-              })}
+              totalCount={companies.length} // TODO: APIから総件数を取得するように変更するのが望ましい
+              onSortChange={handleSortChange}
             />
           )}
           
@@ -202,10 +164,14 @@ export const TopPage: React.FC = () => {
           ) : error ? (
             <div className="error-container">
               <p className="error-message">{error}</p>
+              <button className="retry-button" onClick={() => loadCompanies(true)}>
+                再読み込み
+              </button>
             </div>
-          ) : companies.length === 0 && !loading ? (
+          ) : companies.length === 0 ? (
             <div className="no-results">
               <p>該当する企業が見つかりませんでした。</p>
+              <p>フィルター条件を変更してお試しください。</p>
             </div>
           ) : (
             <>
@@ -216,14 +182,14 @@ export const TopPage: React.FC = () => {
                     <div ref={isLastElement ? lastCompanyElementRef : null} key={company.id}>
                       <CompanyCard
                         company={company}
-                        isRestricted={isUserRestricted && index >= 3 && !isDevRandomMode}
+                        isRestricted={isUserRestricted && index >= 3}
                       />
                     </div>
                   );
                 })}
               </div>
               
-              {isUserRestricted && companies.length > 3 && !isDevRandomMode && (
+              {isUserRestricted && companies.length > 3 && (
                 <div className="registration-prompt">
                   <div className="prompt-content">
                     <h3>すべての企業情報を見るには</h3>
@@ -244,7 +210,7 @@ export const TopPage: React.FC = () => {
                 </div>
               )}
               
-              {!hasMore && companies.length > 0 && !isDevRandomMode && (
+              {!hasMore && companies.length > 0 && (
                 <div className="end-of-list">
                   <p>すべての企業を表示しました</p>
                 </div>
