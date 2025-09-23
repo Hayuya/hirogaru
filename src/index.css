@@ -8,12 +8,12 @@
 }
 
 :root {
-  /* カラーパレットを画像に合わせて変更 */
-  --primary-color: #00585E; /* 画像のメインカラー (濃い青緑) */
-  --primary-dark: #004044;  /* primary-colorの少し暗い版 */
-  --primary-light: #E6F2F4; /* 画像の薄い背景色 */
-  --secondary-color: #00585E; /* secondaryもprimaryに統一 */
-  --secondary-light: #A4C5C9; /* 画像の少し濃い背景色 */
+  /* カラーパレットを紺色ベースに調整 */
+  --primary-color: #0B3D91; /* 深いネイビーブルー */
+  --primary-dark: #062860;  /* primary-colorのより暗いトーン */
+  --primary-light: #E6ECF8; /* 優しいブルー系の淡色 */
+  --secondary-color: #0B3D91; /* secondaryもprimaryに統一 */
+  --secondary-light: #7F9BD6; /* 補助的に使う柔らかいブルー */
   --background-color: #F5F7FA;
   --card-background: #FFFFFF;
   --text-primary: #2C3E50;
