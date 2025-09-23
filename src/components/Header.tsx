@@ -1,6 +1,5 @@
 import React from 'react';
 import type { LiffUser } from '../types/auth';
-import { authManager } from '../auth/authManager';
 import './Header.css';
 
 interface HeaderProps {
@@ -9,14 +8,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ user, isLoggedIn }) => {
-  const handleLogin = () => {
-    authManager.login();
-  };
-
-  const handleLogout = () => {
-    authManager.logout();
-  };
-
   return (
     <header className="header">
       <div className="header-container">
@@ -27,27 +18,18 @@ export const Header: React.FC<HeaderProps> = ({ user, isLoggedIn }) => {
           </nav>
         </div>
         <div className="header-right">
-          {isLoggedIn && user ? (
-            <div className="user-menu">
-              <div className="user-info">
-                {user.pictureUrl && (
-                  <img 
-                    src={user.pictureUrl} 
-                    alt={user.displayName} 
-                    className="user-avatar"
-                  />
-                )}
-                <span className="user-name">{user.displayName}</span>
-              </div>
-              <button className="logout-button" onClick={handleLogout}>
-                ログアウト
-              </button>
-            </div>
-          ) : (
-            <button className="login-button" onClick={handleLogin}>
-              LINEでログイン
-            </button>
-          )}
+          {/* ▼▼▼ ここから変更 ▼▼▼ */}
+          <div className="login-status">
+            {isLoggedIn && user ? (
+              <>
+                <span>ログイン中 ID:</span>
+                <span className="user-id">{user.userId}</span>
+              </>
+            ) : (
+              <span>未ログイン</span>
+            )}
+          </div>
+          {/* ▲▲▲ ここまで変更 ▲▲▲ */}
         </div>
       </div>
     </header>
