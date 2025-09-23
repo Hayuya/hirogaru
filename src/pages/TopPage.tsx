@@ -20,6 +20,7 @@ export const TopPage: React.FC = () => {
     isLoggedIn: false,
     user: null,
     lineUserId: null,
+    isFriend: false, // isFriendの初期値を追加
   });
 
   // フィルター・ソート関連のState
@@ -33,7 +34,7 @@ export const TopPage: React.FC = () => {
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  // LIFF初期化と認証
+  // LIFF初期化と認証情報の取得
   useEffect(() => {
     const initAuth = async () => {
       const state = await authManager.initialize();
@@ -44,7 +45,7 @@ export const TopPage: React.FC = () => {
 
   // 企業データの読み込みトリガー
   useEffect(() => {
-    // 認証が完了（lineUserIdが確定）してからデータ取得を開始
+    // LIFFの初期化が完了してからデータ取得を開始
     if (authState.isInitialized) {
       const handler = setTimeout(() => {
         loadCompanies(true); // 条件が変更されたらリセットして読み込み
@@ -63,7 +64,7 @@ export const TopPage: React.FC = () => {
       const params = {
         skip: currentSkip,
         limit: 20,
-        line_user_id: authState.lineUserId, // ログイン済みならIDが、未ログインならnullが渡される
+        line_user_id: authState.lineUserId,
         sort: currentSort,
         order: sortOrder,
         industry: selectedIndustries.length > 0 ? selectedIndustries.join(',') : undefined,
@@ -98,7 +99,25 @@ export const TopPage: React.FC = () => {
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
 
-  const isUserRestricted = !authState.isLoggedIn;
+  // 「未ログイン」または「友だちでない」場合にコンテンツを制限
+  const isUserRestricted = !authState.isLoggedIn || !authState.isFriend;
+
+  // 友だち追加を促すUI
+  const FriendPrompt = () => (
+    <div className="registration-prompt">
+      <div className="prompt-content">
+        <h3>全コンテンツの閲覧には</h3>
+        <p>LINE公式アカウントの友だち追加が必要です。追加後、再度アクセスしてください。</p>
+        <a 
+          href="https://line.me/R/ti/p/YOUR_OFFICIAL_ACCOUNT_ID" // TODO: ここに公式アカウントのIDを設定
+          className="register-button"
+          style={{ textDecoration: 'none' }}
+        >
+          LINEで友だち追加する
+        </a>
+      </div>
+    </div>
+  );
 
   return (
     <div className="top-page">
@@ -107,31 +126,36 @@ export const TopPage: React.FC = () => {
       
       <main className="main-content">
         <div className="container">
-          <FilterBar
-            selectedIndustries={selectedIndustries}
-            femaleRatioFilter={femaleRatioFilter}
-            relocationFilter={relocationFilter}
-            specialLeaveFilter={specialLeaveFilter}
-            housingAllowanceFilter={housingAllowanceFilter}
-            onIndustryChange={setSelectedIndustries}
-            onFemaleRatioChange={setFemaleRatioFilter}
-            onRelocationChange={setRelocationFilter}
-            onSpecialLeaveChange={setSpecialLeaveFilter}
-            onHousingAllowanceChange={setHousingAllowanceFilter}
-          />
-          
-          {companies.length > 0 && (
-            <SortBar
-              currentSort={currentSort}
-              sortOrder={sortOrder}
-              totalCount={companies.length}
-              onSortChange={(sort, order) => {
-                setCurrentSort(sort);
-                setSortOrder(order);
-              }}
-            />
+          {/* LIFF初期化中、またはログイン中で友だちの場合はフィルターなどを表示 */}
+          {(loading || (authState.isLoggedIn && authState.isFriend)) && (
+            <>
+              <FilterBar
+                selectedIndustries={selectedIndustries}
+                femaleRatioFilter={femaleRatioFilter}
+                relocationFilter={relocationFilter}
+                specialLeaveFilter={specialLeaveFilter}
+                housingAllowanceFilter={housingAllowanceFilter}
+                onIndustryChange={setSelectedIndustries}
+                onFemaleRatioChange={setFemaleRatioFilter}
+                onRelocationChange={setRelocationFilter}
+                onSpecialLeaveChange={setSpecialLeaveFilter}
+                onHousingAllowanceChange={setHousingAllowanceFilter}
+              />
+              {companies.length > 0 && (
+                <SortBar
+                  currentSort={currentSort}
+                  sortOrder={sortOrder}
+                  totalCount={companies.length}
+                  onSortChange={(sort, order) => {
+                    setCurrentSort(sort);
+                    setSortOrder(order);
+                  }}
+                />
+              )}
+            </>
           )}
-          
+
+          {/* コンテンツ表示ロジック */}
           {loading && companies.length === 0 ? (
             <div className="loading-container">
               <div className="loading-spinner"></div>
@@ -141,11 +165,15 @@ export const TopPage: React.FC = () => {
             <div className="error-container">
               <p className="error-message">{error}</p>
             </div>
+          ) : authState.isLoggedIn && !authState.isFriend ? (
+            // ログイン済みだが友だちでない場合
+            <FriendPrompt />
           ) : companies.length === 0 && !loading ? (
             <div className="no-results">
               <p>該当する企業が見つかりませんでした。</p>
             </div>
           ) : (
+            // ログイン済みかつ友だち、または未ログインの場合の企業リスト
             <div className="companies-list">
               {companies.map((company, index) => {
                 const isLastElement = companies.length === index + 1;

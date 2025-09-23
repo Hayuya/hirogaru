@@ -1,7 +1,6 @@
 import liff from '@line/liff';
 import type { AuthState } from '../types/auth';
 
-// LIFF IDを環境変数から取得します。
 const LIFF_ID = import.meta.env.VITE_LIFF_ID;
 
 class AuthManager {
@@ -10,51 +9,52 @@ class AuthManager {
     isLoggedIn: false,
     user: null,
     lineUserId: null,
+    isFriend: false, // <-- 初期値を追加
   };
 
-  /**
-   * LIFFの初期化とユーザーの自動識別
-   */
   async initialize(): Promise<AuthState> {
-    // LIFF IDが設定されていない場合は処理を中断します。
     if (!LIFF_ID) {
-      console.error('LIFF Error: LIFF IDが設定されていません。');
+      console.error('LIFF Error: VITE_LIFF_IDが設定されていません。');
       return this.authState;
     }
 
     try {
-      // LIFF SDKを初期化
       await liff.init({ liffId: LIFF_ID });
       this.authState.isInitialized = true;
       
-      // ユーザーがLINEにログインしているか（LINEアプリ内で閲覧しているか）を確認します。
       if (liff.isLoggedIn()) {
         this.authState.isLoggedIn = true;
         
-        try {
-          // ユーザーのプロフィール情報を取得します。
-          const profile = await liff.getProfile();
-          this.authState.user = {
-            userId: profile.userId,
-            displayName: profile.displayName,
-            pictureUrl: profile.pictureUrl,
-          };
-          // バックエンドAPIに渡すためのLINEユーザーIDをstateに保存します。
-          this.authState.lineUserId = profile.userId;
-        } catch (error) {
-          console.error('LIFF Error: プロフィールの取得に失敗しました。', error);
-          // 予備としてコンテキストからユーザーIDの取得を試みます。
-          const context = liff.getContext();
-          if (context?.userId) {
-            this.authState.lineUserId = context.userId;
-          }
+        // ユーザープロフィールと友だち関係を並行して取得
+        const [profile, friendship] = await Promise.all([
+          liff.getProfile(),
+          liff.getFriendship(),
+        ]);
+
+        // プロフィール情報をstateに保存
+        this.authState.user = {
+          userId: profile.userId,
+          displayName: profile.displayName,
+          pictureUrl: profile.pictureUrl,
+        };
+        this.authState.lineUserId = profile.userId;
+
+        // ▼▼▼ ここから追加 ▼▼▼
+        // 友だち関係をstateに保存
+        if (friendship.friendFlag) {
+          console.log('✅ ユーザーは公式アカウントの友だちです。');
+          this.authState.isFriend = true;
+        } else {
+          console.log('ユーザーはまだ友だちではありません。');
+          this.authState.isFriend = false;
         }
+        // ▲▲▲ ここまで追加 ▲▲▲
+        
       } else {
-        // PCのブラウザなど、LINE環境外からのアクセスの場合は「未ログイン」状態となります。
         this.authState.isLoggedIn = false;
       }
     } catch (error) {
-      console.error('LIFF Error: 初期化に失敗しました。', error);
+      console.error('LIFF Error: 初期化または情報取得に失敗しました。', error);
     }
     
     return this.authState;

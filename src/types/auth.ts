@@ -10,4 +10,5 @@ export interface AuthState {
   isLoggedIn: boolean;
   user: LiffUser | null;
   lineUserId: string | null;
+  isFriend: boolean; // <-- 友だち状態を保持するフラグを追加
 }
