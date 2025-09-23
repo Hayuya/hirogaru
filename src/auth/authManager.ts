@@ -4,7 +4,7 @@ import type { AuthState } from '../types/auth';
 // LIFF IDを環境変数から取得
 const LIFF_ID = import.meta.env.VITE_LIFF_ID || '2008160071-7jkwxNXd';
 // 開発モードフラグ
-const IS_DEV_MODE = import.meta.env.VITE_DEV_MODE === 'false';
+const IS_DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'; // 文字列'true'と比較
 
 class AuthManager {
   private authState: AuthState = {
@@ -21,9 +21,13 @@ class AuthManager {
       console.log('🔧 開発モード: LIFFをモックで動作');
       this.authState = {
         isInitialized: true,
-        isLoggedIn: false,
-        user: null,
-        lineUserId: null,
+        isLoggedIn: true, // 開発モードでもログイン状態にする
+        user: {
+          userId: 'U_DEV_USER_ID_12345',
+          displayName: '開発用ユーザー',
+          pictureUrl: 'https://via.placeholder.com/100',
+        },
+        lineUserId: 'U_DEV_USER_ID_12345',
       };
       return this.authState;
     }
@@ -32,7 +36,8 @@ class AuthManager {
       await liff.init({ liffId: LIFF_ID });
       this.authState.isInitialized = true;
       
-      // ログイン状態の確認
+      // ▼▼▼ ここから変更 ▼▼▼
+      // ログイン状態を確認し、未ログインなら自動でログインを実行
       if (liff.isLoggedIn()) {
         this.authState.isLoggedIn = true;
         
@@ -47,17 +52,19 @@ class AuthManager {
           this.authState.lineUserId = profile.userId;
         } catch (error) {
           console.error('Failed to get profile:', error);
-          // プロフィール取得に失敗してもユーザーIDだけは設定を試みる
           const context = liff.getContext();
           if (context?.userId) {
             this.authState.lineUserId = context.userId;
           }
         }
+      } else {
+        // 未ログインの場合は、LINEログイン画面にリダイレクトしてログインを促す
+        liff.login();
       }
-      // 自動ログインは削除 - ユーザーが明示的にログインボタンをクリックした時のみログイン
+      // ▲▲▲ ここまで変更 ▲▲▲
+
     } catch (error) {
       console.error('LIFF initialization failed:', error);
-      // エラーが発生してもアプリは続行
     }
     
     return this.authState;
@@ -78,19 +85,10 @@ class AuthManager {
     return this.authState.isLoggedIn;
   }
 
-  // ログイン実行
+  // ログイン実行（手動ログイン用として残すが、今回は使われない）
   login(): void {
     if (IS_DEV_MODE) {
-      // 開発モードではモックユーザーでログイン
       console.log('🔧 開発モード: モックユーザーでログイン');
-      this.authState.isLoggedIn = true;
-      this.authState.user = {
-        userId: 'U76a571a8946f918db4a80e959a579ac1',
-        displayName: 'テストユーザー',
-        pictureUrl: 'https://via.placeholder.com/100',
-      };
-      this.authState.lineUserId = 'U76a571a8946f918db4a80e959a579ac1';
-      // ページをリロードして状態を反映
       window.location.reload();
       return;
     }
@@ -103,18 +101,15 @@ class AuthManager {
   // ログアウト
   logout(): void {
     if (IS_DEV_MODE) {
-      // 開発モードではローカルストレージをクリア
       console.log('🔧 開発モード: ログアウト');
-      this.authState.isLoggedIn = false;
-      this.authState.user = null;
-      this.authState.lineUserId = null;
-      // ページをリロードして状態を反映
+      // 開発モードでは実際にはログアウトしないため、リロードのみ
       window.location.reload();
       return;
     }
 
     if (liff.isLoggedIn()) {
       liff.logout();
+      window.location.reload(); // ログアウト後にリロード
     }
   }
 
