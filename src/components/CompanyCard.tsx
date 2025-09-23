@@ -169,7 +169,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
                 </div>
 
                 <div className="detail-section">
-                  <h4 className="detail-title">今後の展望</h4>
+                  <h4 className="detail-title">今後の展望 </h4>
                   <p className="detail-text">{company.future_prospects}</p>
                 </div>
 
