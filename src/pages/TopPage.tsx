@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '../components/Header';
 import { HeroSection } from '../components/HeroSection';
 import { FilterBar } from '../components/FilterBar';
@@ -10,19 +10,31 @@ import { authManager } from '../auth/authManager';
 import type { AuthState } from '../types/auth';
 import './TopPage.css';
 
+// 文字列から数値を抽出するヘルパー関数
+const parseNumericValue = (value: string): number => {
+  if (!value) return 0;
+  const match = value.match(/[\d,.]+/);
+  return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
+};
+
 export const TopPage: React.FC = () => {
-  // State管理
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [loading, setLoading] = useState(true);
-  // errorの初期値をauthStateから受け取るように変更
+  // === State管理 ===
   const [authState, setAuthState] = useState<AuthState>({
     isInitialized: false,
     isLoggedIn: false,
     user: null,
     lineUserId: null,
     isFriend: false,
-    error: null, // <-- errorの初期値を追加
+    error: null,
   });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // ▼▼▼ ここから変更 ▼▼▼
+  const [allCompanies, setAllCompanies] = useState<Company[]>([]); // 全企業データを保持
+  const [companies, setCompanies] = useState<Company[]>([]);       // 表示用企業データを保持
+  // ▲▲▲ ここまで変更 ▲▲▲
 
   // フィルター・ソート関連のState
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
@@ -32,8 +44,8 @@ export const TopPage: React.FC = () => {
   const [housingAllowanceFilter, setHousingAllowanceFilter] = useState(false);
   const [currentSort, setCurrentSort] = useState<SortOption>('starting_salary_graduates');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [skip, setSkip] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
+
+  // === useEffects ===
 
   // LIFF初期化と認証情報の取得
   useEffect(() => {
@@ -44,66 +56,85 @@ export const TopPage: React.FC = () => {
     initAuth();
   }, []);
 
-  // 企業データの読み込みトリガー
+  // 全企業データの初回取得
   useEffect(() => {
-    // LIFF初期化完了 かつ エラーがない場合にデータ取得を開始
-    if (authState.isInitialized && !authState.error) {
-      const handler = setTimeout(() => {
-        loadCompanies(true); // 条件が変更されたらリセットして読み込み
-      }, 500);
-      return () => clearTimeout(handler);
-    }
-  }, [selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder, authState.isInitialized, authState.error]);
+    if (!authState.isInitialized || authState.error) return;
 
-  // 企業データを取得する関数
-  const loadCompanies = async (reset: boolean = false) => {
-    // authState.errorがある場合は処理を中断
-    if (authState.error) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    const currentSkip = reset ? 0 : skip;
-
-    try {
-      const params = {
-        skip: currentSkip,
-        limit: 20,
-        line_user_id: authState.lineUserId,
-        sort: currentSort,
-        order: sortOrder,
-        industry: selectedIndustries.length > 0 ? selectedIndustries.join(',') : undefined,
-        female_ratio_over_30: femaleRatioFilter || undefined,
-        relocation_none: relocationFilter || undefined,
-        has_special_leave: specialLeaveFilter || undefined,
-        has_housing_allowance: housingAllowanceFilter || undefined,
-      };
-
-      const data = await fetchCompanies(params);
-      setCompanies(prev => (reset ? data : [...prev, ...data]));
-      setSkip(currentSkip + data.length);
-      setHasMore(data.length >= 20);
-    } catch (error) {
-      console.error('Failed to load companies:', error);
-      // ここでのエラーはauthState.errorとは別で管理
-      // setError('企業データの読み込みに失敗しました。時間をおいて再度お試しください。');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 無限スクロール用の設定
-  const observer = useRef<IntersectionObserver>();
-  const lastCompanyElementRef = useCallback((node: HTMLDivElement | null) => {
-    if (loading) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        loadCompanies(false); // 追加読み込み
+    const loadInitialCompanies = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchCompanies({ line_user_id: authState.lineUserId });
+        setAllCompanies(data); // 全企業データを保存
+        setCompanies(data);   // 初期表示用にセット
+      } catch (err) {
+        setError('企業データの読み込みに失敗しました。');
+      } finally {
+        setLoading(false);
       }
+    };
+
+    loadInitialCompanies();
+  }, [authState.isInitialized, authState.error, authState.lineUserId]);
+
+  // フィルター・ソート条件の変更時に表示用データを更新
+  useEffect(() => {
+    let filtered = [...allCompanies];
+
+    // 1. フィルター処理
+    if (selectedIndustries.length > 0) {
+      filtered = filtered.filter(c => selectedIndustries.includes(c.industry));
+    }
+    if (femaleRatioFilter) {
+      // gender_ratioが "男性:70%, 女性:30%" のような形式を想定
+      filtered = filtered.filter(c => {
+        const femaleRatioMatch = c.gender_ratio.match(/女性:(\d+)%/);
+        return femaleRatioMatch ? parseInt(femaleRatioMatch[1], 10) >= 30 : false;
+      });
+    }
+    if (relocationFilter) {
+      filtered = filtered.filter(c => c.relocation === 'なし');
+    }
+    if (specialLeaveFilter) {
+      filtered = filtered.filter(c => c.special_leave === 'あり');
+    }
+    if (housingAllowanceFilter) {
+      filtered = filtered.filter(c => c.housing_allowance === 'あり');
+    }
+
+    // 2. ソート処理
+    filtered.sort((a, b) => {
+      let valA: number | string;
+      let valB: number | string;
+
+      switch (currentSort) {
+        case 'starting_salary_graduates':
+        case 'revenue':
+          valA = parseNumericValue(a[currentSort]);
+          valB = parseNumericValue(b[currentSort]);
+          break;
+        case 'number_of_employees':
+        case 'average_overtime_hours':
+        case 'average_years_of_service':
+        case 'average_age':
+          valA = a[currentSort];
+          valB = b[currentSort];
+          break;
+        default:
+          return 0;
+      }
+
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
     });
-    if (node) observer.current.observe(node);
-  }, [loading, hasMore]);
+
+    setCompanies(filtered);
+
+  }, [allCompanies, selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder]);
+
+
+  // === レンダリングロジック ===
 
   const isUserRestricted = !authState.isLoggedIn || !authState.isFriend;
 
@@ -113,7 +144,7 @@ export const TopPage: React.FC = () => {
         <h3>全コンテンツの閲覧には</h3>
         <p>LINE公式アカウントの友だち追加が必要です。追加後、再度アクセスしてください。</p>
         <a 
-          href="https://line.me/R/ti/p/YOUR_OFFICIAL_ACCOUNT_ID"
+          href="https://line.me/R/ti/p/YOUR_OFFICIAL_ACCOUNT_ID" // TODO: ここに公式アカウントのIDを設定
           className="register-button"
           style={{ textDecoration: 'none' }}
         >
@@ -122,66 +153,30 @@ export const TopPage: React.FC = () => {
       </div>
     </div>
   );
-  
-  // ▼▼▼ ここからコンテンツ表示ロジックを修正 ▼▼▼
+
   const renderContent = () => {
-    // 1. LIFFの初期化がまだ終わっていない場合
-    if (!authState.isInitialized) {
+    if (!authState.isInitialized || loading) {
       return (
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p className="loading-text">アプリケーションを準備しています...</p>
+          <p className="loading-text">データを読み込んでいます...</p>
         </div>
       );
     }
-
-    // 2. LIFFの初期化でエラーが発生した場合
-    if (authState.error) {
-      return (
-        <div className="error-container">
-          <p className="error-message">{authState.error}</p>
-        </div>
-      );
-    }
-
-    // 3. 企業データ読み込み中の場合 (初回)
-    if (loading && companies.length === 0) {
-      return (
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p className="loading-text">企業データを読み込んでいます...</p>
-        </div>
-      );
-    }
-
-    // 4. ログイン済みだが友だちでない場合
-    if (authState.isLoggedIn && !authState.isFriend) {
-      return <FriendPrompt />;
-    }
-
-    // 5. 該当企業が0件の場合
-    if (companies.length === 0 && !loading) {
-      return (
-        <div className="no-results">
-          <p>該当する企業が見つかりませんでした。</p>
-        </div>
-      );
-    }
+    if (authState.error) return <div className="error-container"><p className="error-message">{authState.error}</p></div>;
+    if (error) return <div className="error-container"><p className="error-message">{error}</p></div>;
+    if (authState.isLoggedIn && !authState.isFriend) return <FriendPrompt />;
+    if (companies.length === 0) return <div className="no-results"><p>該当する企業が見つかりませんでした。</p></div>;
     
-    // 6. 正常に企業リストを表示
     return (
       <div className="companies-list">
-        {companies.map((company, index) => {
-          const isLastElement = companies.length === index + 1;
-          return (
-            <div ref={isLastElement ? lastCompanyElementRef : null} key={company.id}>
-              <CompanyCard
-                company={company}
-                isRestricted={isUserRestricted && index >= 3}
-              />
-            </div>
-          );
-        })}
+        {companies.map((company, index) => (
+          <CompanyCard
+            key={company.id}
+            company={company}
+            isRestricted={isUserRestricted && index >= 3}
+          />
+        ))}
       </div>
     );
   };
@@ -193,7 +188,7 @@ export const TopPage: React.FC = () => {
       
       <main className="main-content">
         <div className="container">
-          {authState.isInitialized && !authState.error && (authState.isLoggedIn && authState.isFriend) && (
+          {authState.isLoggedIn && authState.isFriend && (
             <>
               <FilterBar
                 selectedIndustries={selectedIndustries}
@@ -207,17 +202,15 @@ export const TopPage: React.FC = () => {
                 onSpecialLeaveChange={setSpecialLeaveFilter}
                 onHousingAllowanceChange={setHousingAllowanceFilter}
               />
-              {companies.length > 0 && (
-                <SortBar
-                  currentSort={currentSort}
-                  sortOrder={sortOrder}
-                  totalCount={companies.length}
-                  onSortChange={(sort, order) => {
-                    setCurrentSort(sort);
-                    setSortOrder(order);
-                  }}
-                />
-              )}
+              <SortBar
+                currentSort={currentSort}
+                sortOrder={sortOrder}
+                totalCount={companies.length} // 表示件数を渡す
+                onSortChange={(sort, order) => {
+                  setCurrentSort(sort);
+                  setSortOrder(order);
+                }}
+              />
             </>
           )}
 
