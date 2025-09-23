@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://test.hiroshima-shukatsu.site/api/v1';
+// 開発環境ではViteのプロキシを経由するため相対パスを、
+// 本番環境では環境変数に設定された絶対パスを使用する
+const BASE_URL = import.meta.env.DEV 
+  ? '/api/v1' 
+  : import.meta.env.VITE_API_BASE_URL || 'https://test.hiroshima-shukatsu.site/api/v1';
 
 // Axiosインスタンスの作成
 export const axiosClient = axios.create({
