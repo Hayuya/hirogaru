@@ -13,6 +13,15 @@ import { LineUserDetailForm } from '../components/LineUserDetailForm';
 import { createLineUserDetail, getLineUserDetail } from '../api/lineUserDetailApi';
 import { logLineAction } from '../api/lineActionApi';
 
+const SORT_LABEL_MAP: Record<SortOption, string> = {
+  starting_salary_graduates: '初任給',
+  revenue: '売上高',
+  number_of_employees: '従業員数',
+  average_overtime_hours: '残業時間',
+  average_years_of_service: '平均勤続年数',
+  average_age: '平均年齢',
+};
+
 // 文字列/数値から数値を確実に抽出するヘルパー関数
 const parseNumericValue = (value: string | number): number => {
   if (typeof value === 'number') return value;
@@ -142,7 +151,15 @@ export const TopPage: React.FC = () => {
   }, [allCompanies, filters, sort]);
 
   // === イベントハンドラ ===
-  const handleSortChange = (key: SortOption, order: 'asc' | 'desc') => setSort({ key, order });
+  const handleSortChange = useCallback((key: SortOption, order: 'asc' | 'desc') => {
+    setSort({ key, order });
+
+    if (!authState.lineUserId) return;
+
+    const label = SORT_LABEL_MAP[key] ?? key;
+    const actionName = `button_click_sort-${label}`;
+    void logLineAction({ lineUserId: authState.lineUserId, actionName });
+  }, [authState.lineUserId]);
 
   const handleDetailSubmit = async ({
     university,
