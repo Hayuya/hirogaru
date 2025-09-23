@@ -14,19 +14,18 @@ import './TopPage.css';
 const parseNumericValue = (value: string | number): number => {
   if (typeof value === 'number') return value;
   if (!value) return 0;
-  // "235,000円"のような形式から数値のみを抽出
   const match = value.match(/[\d,.]+/);
   return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
 };
 
 export const TopPage: React.FC = () => {
-  // === State管理 ===
+  // State管理
   const [authState, setAuthState] = useState<AuthState>({
     isInitialized: false, isLoggedIn: false, user: null, lineUserId: null, isFriend: false, error: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [allCompanies, setAllCompanies] = useState<Company[]>([]); // APIから取得した加工前の全企業データ
+  const [allCompanies, setAllCompanies] = useState<Company[]>([]);
 
   // フィルター・ソート関連のState
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
@@ -37,8 +36,6 @@ export const TopPage: React.FC = () => {
   const [currentSort, setCurrentSort] = useState<SortOption>('starting_salary_graduates');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  // === useEffects ===
-
   // LIFF初期化
   useEffect(() => {
     authManager.initialize().then(setAuthState);
@@ -47,8 +44,7 @@ export const TopPage: React.FC = () => {
   // 全企業データの初回取得
   useEffect(() => {
     if (!authState.isInitialized || authState.error) {
-      if (!authState.isInitialized) setLoading(true); // 初期化が終わるまでローディング
-      else setLoading(false); // 初期化エラーならローディング終了
+      setLoading(authState.isInitialized ? false : true);
       return;
     }
 
@@ -57,7 +53,7 @@ export const TopPage: React.FC = () => {
       setError(null);
       try {
         const data = await fetchCompanies({ line_user_id: authState.lineUserId });
-        setAllCompanies(data);
+        setAllCompanies(data); // APIからのデータで完全に上書きする
       } catch (err) {
         setError('企業データの読み込みに失敗しました。');
       } finally {
@@ -68,11 +64,11 @@ export const TopPage: React.FC = () => {
     loadInitialCompanies();
   }, [authState.isInitialized, authState.error, authState.lineUserId]);
 
-  // ▼▼▼ useMemoを使用して、表示用データを安全に再計算 ▼▼▼
+  // 表示用データの計算
   const companies = useMemo(() => {
     let processedCompanies = [...allCompanies];
 
-    // 1. フィルター処理
+    // フィルター処理
     if (selectedIndustries.length > 0) {
       processedCompanies = processedCompanies.filter(c => selectedIndustries.includes(c.industry));
     }
@@ -92,11 +88,10 @@ export const TopPage: React.FC = () => {
       processedCompanies = processedCompanies.filter(c => c.housing_allowance === 'あり');
     }
 
-    // 2. ソート処理
+    // ソート処理
     processedCompanies.sort((a, b) => {
       const valA = parseNumericValue(a[currentSort]);
       const valB = parseNumericValue(b[currentSort]);
-
       if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
       if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
       return 0;
@@ -104,9 +99,8 @@ export const TopPage: React.FC = () => {
 
     return processedCompanies;
   }, [allCompanies, selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder]);
-
-  // === レンダリングロジック ===
-
+  
+  // ... (以降のレンダリングロジックは変更なし)
   const isUserRestricted = !authState.isLoggedIn || !authState.isFriend;
 
   const FriendPrompt = () => (
@@ -141,7 +135,7 @@ export const TopPage: React.FC = () => {
           <CompanyCard
             key={company.id}
             company={company}
-            displayRank={index + 1} // Mapのindexを元に動的な順位を渡す
+            displayRank={index + 1}
             isRestricted={isUserRestricted && index >= 3}
           />
         ))}
