@@ -109,7 +109,7 @@ export const TopPage: React.FC = () => {
         <h3>全コンテンツの閲覧には</h3>
         <p>LINE公式アカウントの友だち追加が必要です。追加後、再度アクセスしてください。</p>
         <a 
-          href="https://line.me/R/ti/p/YOUR_OFFICIAL_ACCOUNT_ID" // TODO: ここに公式アカウントのIDを設定
+          href="2008160071-7jkwxNXd" // TODO: ここに公式アカウントのIDを設定
           className="register-button"
           style={{ textDecoration: 'none' }}
         >
