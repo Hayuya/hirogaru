@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Header } from '../components/Header';
 import { HeroSection } from '../components/HeroSection';
 import { FilterBar } from '../components/FilterBar';
@@ -32,6 +32,7 @@ export const TopPage: React.FC = () => {
   const [detailErrorMessage, setDetailErrorMessage] = useState<string | null>(null);
   const [detailSuccessMessage, setDetailSuccessMessage] = useState<string | null>(null);
   const [isSubmittingDetail, setIsSubmittingDetail] = useState(false);
+  const originalOverflowRef = useRef<string | null>(null);
 
   // フィルター・ソートのState
   const [filters, setFilters] = useState({
@@ -45,6 +46,45 @@ export const TopPage: React.FC = () => {
     key: 'starting_salary_graduates',
     order: 'desc',
   });
+  const isDetailGateActive = detailState === 'loading' || detailState === 'show-form' || detailState === 'error';
+
+  const loadLineUserDetail = useCallback(async (lineUserId: string) => {
+    setDetailState('loading');
+    setDetailErrorMessage(null);
+    try {
+      const detail = await getLineUserDetail(lineUserId);
+      if (detail) {
+        setDetailState('hidden');
+      } else {
+        setDetailState('show-form');
+      }
+    } catch (error) {
+      console.error('Failed to load line user detail', error);
+      setDetailErrorMessage('登録情報の取得に失敗しました。しばらく時間をおいて再度お試しください。');
+      setDetailState('error');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    if (isDetailGateActive) {
+      if (originalOverflowRef.current === null) {
+        originalOverflowRef.current = document.body.style.overflow;
+      }
+      document.body.style.overflow = 'hidden';
+    } else if (originalOverflowRef.current !== null) {
+      document.body.style.overflow = originalOverflowRef.current;
+      originalOverflowRef.current = null;
+    }
+
+    return () => {
+      if (originalOverflowRef.current !== null) {
+        document.body.style.overflow = originalOverflowRef.current;
+        originalOverflowRef.current = null;
+      }
+    };
+  }, [isDetailGateActive]);
 
   // === 初期化処理 ===
   useEffect(() => {
@@ -62,20 +102,7 @@ export const TopPage: React.FC = () => {
         }
 
         if (state.lineUserId) {
-          setDetailState('loading');
-          setDetailErrorMessage(null);
-          try {
-            const detail = await getLineUserDetail(state.lineUserId);
-            if (detail) {
-              setDetailState('hidden');
-            } else {
-              setDetailState('show-form');
-            }
-          } catch (error) {
-            console.error('Failed to load line user detail', error);
-            setDetailErrorMessage('登録情報の取得に失敗しました。しばらく時間をおいて再度お試しください。');
-            setDetailState('error');
-          }
+          void loadLineUserDetail(state.lineUserId);
         } else {
           setDetailState('hidden');
         }
@@ -85,7 +112,7 @@ export const TopPage: React.FC = () => {
       setIsLoading(false);
     };
     initApp();
-  }, []);
+  }, [loadLineUserDetail]);
 
   // === データ加工処理 (useMemo) ===
   const displayedCompanies = useMemo(() => {
@@ -143,6 +170,7 @@ export const TopPage: React.FC = () => {
         department,
         hometown,
       });
+      setDetailErrorMessage(null);
       setDetailSuccessMessage('登録が完了しました。ありがとうございます。');
       setDetailState('hidden');
     } catch (error) {
@@ -150,6 +178,12 @@ export const TopPage: React.FC = () => {
       setDetailErrorMessage('登録に失敗しました。お手数ですが、再度お試しください。');
     } finally {
       setIsSubmittingDetail(false);
+    }
+  };
+
+  const handleRetryDetailFetch = () => {
+    if (authState.lineUserId) {
+      void loadLineUserDetail(authState.lineUserId);
     }
   };
 
@@ -194,30 +228,34 @@ export const TopPage: React.FC = () => {
 
   return (
     <div className="top-page">
-      <Header user={authState.user} isLoggedIn={authState.isLoggedIn} />
-      <HeroSection />
-      <main className="main-content">
-        <div className="container">
-          {detailState === 'loading' && (
-            <div className="line-user-detail-form">
-              <p>登録情報を確認しています…</p>
-            </div>
-          )}
-
-          {detailState === 'error' && detailErrorMessage && (
-            <div className="error-container">
-              <p className="error-message">{detailErrorMessage}</p>
-            </div>
-          )}
-
-          {detailState === 'show-form' && authState.lineUserId && (
+      {isDetailGateActive && (
+        <div className="line-user-detail-overlay">
+          {detailState === 'show-form' && authState.lineUserId ? (
             <LineUserDetailForm
               onSubmit={handleDetailSubmit}
               isSubmitting={isSubmittingDetail}
               errorMessage={detailErrorMessage}
             />
+          ) : (
+            <div className="line-user-detail-panel">
+              {detailState === 'loading' && <p className="panel-message">登録情報を確認しています…</p>}
+              {detailState === 'error' && (
+                <>
+                  <h2>登録情報の取得に失敗しました</h2>
+                  <p className="panel-message">{detailErrorMessage ?? 'しばらく時間をおいて再度お試しください。'}</p>
+                  <button type="button" onClick={handleRetryDetailFetch}>
+                    再試行する
+                  </button>
+                </>
+              )}
+            </div>
           )}
-
+        </div>
+      )}
+      <Header user={authState.user} isLoggedIn={authState.isLoggedIn} />
+      <HeroSection />
+      <main className="main-content">
+        <div className="container">
           {detailSuccessMessage && (
             <div className="line-user-detail-success">
               <p>{detailSuccessMessage}</p>
