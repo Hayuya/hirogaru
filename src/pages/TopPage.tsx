@@ -25,7 +25,9 @@ export const TopPage: React.FC = () => {
   // フィルター・ソート関連のState
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [femaleRatioFilter, setFemaleRatioFilter] = useState(false);
-  const [welfareFilter, setWelfareFilter] = useState(false);
+  const [relocationFilter, setRelocationFilter] = useState(false); // 転勤なしフィルター
+  const [specialLeaveFilter, setSpecialLeaveFilter] = useState(false); // 特別休暇フィルター
+  const [housingAllowanceFilter, setHousingAllowanceFilter] = useState(false); // 住宅手当フィルター
   const [currentSort, setCurrentSort] = useState<SortOption>('starting_salary_graduates');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [skip, setSkip] = useState(0);
@@ -48,35 +50,45 @@ export const TopPage: React.FC = () => {
   useEffect(() => {
     // 500msのデバウンス処理
     const handler = setTimeout(() => {
-      loadCompanies();
+      loadCompanies(true); // フィルター変更時はリセットする
     }, 500);
 
     // クリーンアップ関数でタイマーをクリア
     return () => {
       clearTimeout(handler);
     };
-  }, [selectedIndustries, femaleRatioFilter, welfareFilter, currentSort, sortOrder, authState.lineUserId]);
+  }, [selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder, authState.lineUserId]);
 
-  const loadCompanies = async () => {
+  const loadCompanies = async (reset: boolean = false) => {
     setLoading(true);
     setError(null);
-    setCompanies([]); // フィルター/ソート変更時はリストをリセット
+    if (reset) {
+      setCompanies([]);
+      setSkip(0);
+      setHasMore(true);
+    }
 
     try {
       const params = {
-        skip: 0,
-        limit: 20, // 初回読み込み件数を調整
+        skip: reset ? 0 : skip,
+        limit: 20,
         line_user_id: authState.lineUserId,
         sort: currentSort,
         order: sortOrder,
         industry: selectedIndustries.length > 0 ? selectedIndustries.join(',') : undefined,
         female_ratio_over_30: femaleRatioFilter || undefined,
-        has_welfare: welfareFilter || undefined,
+        relocation_none: relocationFilter || undefined,
+        has_special_leave: specialLeaveFilter || undefined,
+        has_housing_allowance: housingAllowanceFilter || undefined,
       };
 
       const data = await fetchCompanies(params);
-      setCompanies(data);
-      setSkip(data.length);
+      if (reset) {
+        setCompanies(data);
+      } else {
+        setCompanies(prev => [...prev, ...data]);
+      }
+      setSkip(prev => (reset ? data.length : prev + data.length));
       setHasMore(data.length >= 20);
     } catch (error) {
       console.error('Failed to load companies:', error);
@@ -87,31 +99,9 @@ export const TopPage: React.FC = () => {
   };
 
   // 無限スクロールによる追加読み込み
-  const loadMoreCompanies = async () => {
+  const loadMoreCompanies = () => {
     if (loading || !hasMore) return;
-
-    setLoading(true);
-    try {
-      const params = {
-        skip: skip,
-        limit: 20,
-        line_user_id: authState.lineUserId,
-        sort: currentSort,
-        order: sortOrder,
-        industry: selectedIndustries.length > 0 ? selectedIndustries.join(',') : undefined,
-        female_ratio_over_30: femaleRatioFilter || undefined,
-        has_welfare: welfareFilter || undefined,
-      };
-
-      const data = await fetchCompanies(params);
-      setCompanies(prev => [...prev, ...data]);
-      setSkip(prev => prev + data.length);
-      setHasMore(data.length > 0);
-    } catch (error) {
-      console.error('Failed to load more companies:', error);
-    } finally {
-      setLoading(false);
-    }
+    loadCompanies(false);
   };
   
   const handleSortChange = (sort: SortOption, order: 'asc' | 'desc') => {
@@ -147,17 +137,21 @@ export const TopPage: React.FC = () => {
           <FilterBar
             selectedIndustries={selectedIndustries}
             femaleRatioFilter={femaleRatioFilter}
-            welfareFilter={welfareFilter}
+            relocationFilter={relocationFilter}
+            specialLeaveFilter={specialLeaveFilter}
+            housingAllowanceFilter={housingAllowanceFilter}
             onIndustryChange={setSelectedIndustries}
             onFemaleRatioChange={setFemaleRatioFilter}
-            onWelfareChange={setWelfareFilter}
+            onRelocationChange={setRelocationFilter}
+            onSpecialLeaveChange={setSpecialLeaveFilter}
+            onHousingAllowanceChange={setHousingAllowanceFilter}
           />
           
           {companies.length > 0 && (
             <SortBar
               currentSort={currentSort}
               sortOrder={sortOrder}
-              totalCount={companies.length} // ここは総件数をAPIから取得できればより良い
+              totalCount={companies.length} // TODO: APIから総件数を取得するように変更するのが望ましい
               onSortChange={handleSortChange}
             />
           )}
@@ -170,7 +164,7 @@ export const TopPage: React.FC = () => {
           ) : error ? (
             <div className="error-container">
               <p className="error-message">{error}</p>
-              <button className="retry-button" onClick={loadCompanies}>
+              <button className="retry-button" onClick={() => loadCompanies(true)}>
                 再読み込み
               </button>
             </div>
@@ -183,24 +177,15 @@ export const TopPage: React.FC = () => {
             <>
               <div className="companies-list">
                 {companies.map((company, index) => {
-                  if (companies.length === index + 1) {
-                    return (
-                      <div ref={lastCompanyElementRef} key={company.id}>
-                        <CompanyCard
-                          company={company}
-                          isRestricted={isUserRestricted && index >= 3}
-                        />
-                      </div>
-                    );
-                  } else {
-                    return (
+                  const isLastElement = companies.length === index + 1;
+                  return (
+                    <div ref={isLastElement ? lastCompanyElementRef : null} key={company.id}>
                       <CompanyCard
-                        key={company.id}
                         company={company}
                         isRestricted={isUserRestricted && index >= 3}
                       />
-                    );
-                  }
+                    </div>
+                  );
                 })}
               </div>
               

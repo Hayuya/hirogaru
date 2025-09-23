@@ -5,19 +5,27 @@ import './FilterBar.css';
 interface FilterBarProps {
   selectedIndustries: string[];
   femaleRatioFilter: boolean;
-  welfareFilter: boolean;
+  relocationFilter: boolean;
+  specialLeaveFilter: boolean;
+  housingAllowanceFilter: boolean;
   onIndustryChange: (industries: string[]) => void;
   onFemaleRatioChange: (checked: boolean) => void;
-  onWelfareChange: (checked: boolean) => void;
+  onRelocationChange: (checked: boolean) => void;
+  onSpecialLeaveChange: (checked: boolean) => void;
+  onHousingAllowanceChange: (checked: boolean) => void;
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
   selectedIndustries,
   femaleRatioFilter,
-  welfareFilter,
+  relocationFilter,
+  specialLeaveFilter,
+  housingAllowanceFilter,
   onIndustryChange,
   onFemaleRatioChange,
-  onWelfareChange,
+  onRelocationChange,
+  onSpecialLeaveChange,
+  onHousingAllowanceChange,
 }) => {
   const handleIndustryClick = (industry: string) => {
     if (selectedIndustries.includes(industry)) {
@@ -30,7 +38,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const handleClearAll = () => {
     onIndustryChange([]);
     onFemaleRatioChange(false);
-    onWelfareChange(false);
+    onRelocationChange(false);
+    onSpecialLeaveChange(false);
+    onHousingAllowanceChange(false);
   };
 
   return (
@@ -64,15 +74,31 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <label className="checkbox-label">
             <input
               type="checkbox"
-              checked={welfareFilter}
-              onChange={(e) => onWelfareChange(e.target.checked)}
+              checked={relocationFilter}
+              onChange={(e) => onRelocationChange(e.target.checked)}
             />
-            <span>充実した福利厚生</span>
+            <span>転勤なし</span>
+          </label>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={specialLeaveFilter}
+              onChange={(e) => onSpecialLeaveChange(e.target.checked)}
+            />
+            <span>特別休暇あり</span>
+          </label>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={housingAllowanceFilter}
+              onChange={(e) => onHousingAllowanceChange(e.target.checked)}
+            />
+            <span>住宅手当あり</span>
           </label>
         </div>
       </div>
       
-      {(selectedIndustries.length > 0 || femaleRatioFilter || welfareFilter) && (
+      {(selectedIndustries.length > 0 || femaleRatioFilter || relocationFilter || specialLeaveFilter || housingAllowanceFilter) && (
         <button className="clear-filters-btn" onClick={handleClearAll}>
           フィルターをクリア
         </button>

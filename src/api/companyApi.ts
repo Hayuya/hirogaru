@@ -9,7 +9,9 @@ interface CompaniesParams {
   order?: 'asc' | 'desc';
   industry?: string;
   female_ratio_over_30?: boolean;
-  has_welfare?: boolean;
+  relocation_none?: boolean; // 「転勤なし」フィルターを追加
+  has_special_leave?: boolean; // 「特別休暇あり」フィルターを追加
+  has_housing_allowance?: boolean; // 「住宅手当あり」フィルターを追加
 }
 
 // 企業一覧を取得
@@ -31,8 +33,15 @@ export const fetchCompanies = async (params: CompaniesParams): Promise<Company[]
     if (params.female_ratio_over_30 !== undefined) {
       queryParams.append('female_ratio_over_30', params.female_ratio_over_30.toString());
     }
-    if (params.has_welfare !== undefined) {
-      queryParams.append('has_welfare', params.has_welfare.toString());
+    // 新しい福利厚生フィルターをクエリパラメータに追加
+    if (params.relocation_none !== undefined) {
+      queryParams.append('relocation_none', params.relocation_none.toString());
+    }
+    if (params.has_special_leave !== undefined) {
+      queryParams.append('has_special_leave', params.has_special_leave.toString());
+    }
+    if (params.has_housing_allowance !== undefined) {
+      queryParams.append('has_housing_allowance', params.has_housing_allowance.toString());
     }
     
     const response = await axiosClient.get<Company[]>(`/companies?${queryParams.toString()}`);
