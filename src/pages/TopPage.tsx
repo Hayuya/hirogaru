@@ -9,6 +9,8 @@ import { fetchCompanies } from '../api/companyApi';
 import { authManager } from '../auth/authManager';
 import type { AuthState } from '../types/auth';
 import './TopPage.css';
+import { LineUserDetailForm } from '../components/LineUserDetailForm';
+import { createLineUserDetail, getLineUserDetail } from '../api/lineUserDetailApi';
 
 // 文字列/数値から数値を確実に抽出するヘルパー関数
 const parseNumericValue = (value: string | number): number => {
@@ -26,6 +28,10 @@ export const TopPage: React.FC = () => {
   const [allCompanies, setAllCompanies] = useState<Company[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [detailState, setDetailState] = useState<'idle' | 'loading' | 'show-form' | 'hidden' | 'error'>('idle');
+  const [detailErrorMessage, setDetailErrorMessage] = useState<string | null>(null);
+  const [detailSuccessMessage, setDetailSuccessMessage] = useState<string | null>(null);
+  const [isSubmittingDetail, setIsSubmittingDetail] = useState(false);
 
   // フィルター・ソートのState
   const [filters, setFilters] = useState({
@@ -45,6 +51,7 @@ export const TopPage: React.FC = () => {
     const initApp = async () => {
       const state = await authManager.initialize();
       setAuthState(state);
+      setDetailSuccessMessage(null);
 
       if (state.isInitialized && !state.error) {
         try {
@@ -53,6 +60,27 @@ export const TopPage: React.FC = () => {
         } catch (err) {
           setApiError('企業データの読み込みに失敗しました。');
         }
+
+        if (state.lineUserId) {
+          setDetailState('loading');
+          setDetailErrorMessage(null);
+          try {
+            const detail = await getLineUserDetail(state.lineUserId);
+            if (detail) {
+              setDetailState('hidden');
+            } else {
+              setDetailState('show-form');
+            }
+          } catch (error) {
+            console.error('Failed to load line user detail', error);
+            setDetailErrorMessage('登録情報の取得に失敗しました。しばらく時間をおいて再度お試しください。');
+            setDetailState('error');
+          }
+        } else {
+          setDetailState('hidden');
+        }
+      } else {
+        setDetailState('hidden');
       }
       setIsLoading(false);
     };
@@ -87,6 +115,43 @@ export const TopPage: React.FC = () => {
 
   // === イベントハンドラ ===
   const handleSortChange = (key: SortOption, order: 'asc' | 'desc') => setSort({ key, order });
+
+  const handleDetailSubmit = async ({
+    university,
+    faculty,
+    department,
+    hometown,
+  }: {
+    university: string;
+    faculty: string;
+    department: string | null;
+    hometown: string | null;
+  }) => {
+    if (!authState.lineUserId) {
+      setDetailErrorMessage('LINEユーザーIDを取得できませんでした。');
+      return;
+    }
+
+    setIsSubmittingDetail(true);
+    setDetailErrorMessage(null);
+
+    try {
+      await createLineUserDetail({
+        line_user_id: authState.lineUserId,
+        university,
+        faculty,
+        department,
+        hometown,
+      });
+      setDetailSuccessMessage('登録が完了しました。ありがとうございます。');
+      setDetailState('hidden');
+    } catch (error) {
+      console.error('Failed to submit line user detail', error);
+      setDetailErrorMessage('登録に失敗しました。お手数ですが、再度お試しください。');
+    } finally {
+      setIsSubmittingDetail(false);
+    }
+  };
 
   // === レンダリング ===
   const isUserRestricted = !authState.isLoggedIn || !authState.isFriend;
@@ -133,6 +198,32 @@ export const TopPage: React.FC = () => {
       <HeroSection />
       <main className="main-content">
         <div className="container">
+          {detailState === 'loading' && (
+            <div className="line-user-detail-form">
+              <p>登録情報を確認しています…</p>
+            </div>
+          )}
+
+          {detailState === 'error' && detailErrorMessage && (
+            <div className="error-container">
+              <p className="error-message">{detailErrorMessage}</p>
+            </div>
+          )}
+
+          {detailState === 'show-form' && authState.lineUserId && (
+            <LineUserDetailForm
+              onSubmit={handleDetailSubmit}
+              isSubmitting={isSubmittingDetail}
+              errorMessage={detailErrorMessage}
+            />
+          )}
+
+          {detailSuccessMessage && (
+            <div className="line-user-detail-success">
+              <p>{detailSuccessMessage}</p>
+            </div>
+          )}
+
           {authState.isLoggedIn && authState.isFriend && (
             <>
               <FilterBar
