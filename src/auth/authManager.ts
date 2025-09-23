@@ -4,9 +4,6 @@ import { logLineAction } from '../api/lineActionApi';
 
 const LIFF_ID = import.meta.env.VITE_LIFF_ID;
 
-// セッション内でトラッキングが一度だけ実行されたか管理するフラグ
-let isActionLogged = false;
-
 class AuthManager {
   private authState: AuthState = {
     isInitialized: false,
@@ -16,15 +13,16 @@ class AuthManager {
     isFriend: false,
     error: null,
   };
+  
+  // セッション内でのトラッキング重複を防ぐフラグをクラス変数に変更
+  private isActionLogged = false;
 
   async initialize(): Promise<AuthState> {
-    // 既に初期化済みの場合は、現在の状態をそのまま返す
     if (this.authState.isInitialized) {
       return this.authState;
     }
 
     if (!LIFF_ID) {
-      console.error('LIFF Error: VITE_LIFF_IDが設定されていません。');
       this.authState.error = 'LIFF IDが設定されていません。';
       this.authState.isInitialized = true;
       return this.authState;
@@ -48,24 +46,18 @@ class AuthManager {
         };
         this.authState.lineUserId = profile.userId;
 
-        // ▼▼▼ ここから修正 ▼▼▼
-        // セッション内で一度もログが送信されていなければ、トラッキングAPIを呼び出す
-        if (profile.userId && !isActionLogged) {
-          // ログ送信処理を実行
+        // ユーザーIDが取得でき、かつまだログが送信されていなければ実行
+        if (profile.userId && !this.isActionLogged) {
+          // トラッキングAPIを呼び出す
           logLineAction({
             lineUserId: profile.userId,
             actionName: 'RichMenuClick',
           });
           // 送信済みフラグを立てる
-          isActionLogged = true;
+          this.isActionLogged = true;
         }
-        // ▲▲▲ ここまで修正 ▲▲▲
 
-        if (friendship.friendFlag) {
-          this.authState.isFriend = true;
-        } else {
-          this.authState.isFriend = false;
-        }
+        this.authState.isFriend = friendship.friendFlag;
         
       } else {
         this.authState.isLoggedIn = false;
