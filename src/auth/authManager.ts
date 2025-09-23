@@ -1,5 +1,6 @@
 import liff from '@line/liff';
 import type { AuthState } from '../types/auth';
+import { logLineAction } from '../api/lineActionApi'; // 作成したAPI関数をインポート
 
 const LIFF_ID = import.meta.env.VITE_LIFF_ID;
 
@@ -10,14 +11,14 @@ class AuthManager {
     user: null,
     lineUserId: null,
     isFriend: false,
-    error: null, // <-- 初期値を追加
+    error: null,
   };
 
   async initialize(): Promise<AuthState> {
     if (!LIFF_ID) {
       console.error('LIFF Error: VITE_LIFF_IDが設定されていません。');
       this.authState.error = 'LIFF IDが設定されていません。';
-      this.authState.isInitialized = true; // <-- ここでも初期化完了とする
+      this.authState.isInitialized = true;
       return this.authState;
     }
 
@@ -39,6 +40,15 @@ class AuthManager {
         };
         this.authState.lineUserId = profile.userId;
 
+        // ▼▼▼ ここから追加 ▼▼▼
+        // RichMenuClickアクションをサーバーに記録
+        // 初期化処理をブロックしないように、awaitせず実行
+        logLineAction({
+          lineUserId: profile.userId,
+          actionName: 'RichMenuClick',
+        });
+        // ▲▲▲ ここまで追加 ▲▲▲
+
         if (friendship.friendFlag) {
           console.log('✅ ユーザーは公式アカウントの友だちです。');
           this.authState.isFriend = true;
@@ -52,9 +62,9 @@ class AuthManager {
       }
     } catch (error) {
       console.error('LIFF Error: 初期化または情報取得に失敗しました。', error);
-      this.authState.error = 'LIFFの初期化に失敗しました。時間をおいて再度お試しください。'; // <-- エラー情報をstateに格納
+      this.authState.error = 'LIFFの初期化に失敗しました。時間をおいて再度お試しください。';
     } finally {
-      this.authState.isInitialized = true; // <-- 成功・失敗に関わらず初期化完了とする
+      this.authState.isInitialized = true;
     }
     
     return this.authState;
