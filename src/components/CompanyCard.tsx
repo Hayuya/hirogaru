@@ -6,13 +6,17 @@ interface CompanyCardProps {
   company: Company;
   isRestricted: boolean;
   displayRank: number; // 親コンポーネントから渡される動的な順位
+  onViewDetails?: (company: Company) => void;
 }
 
-export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted, displayRank }) => {
+export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted, displayRank, onViewDetails }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpanded = () => {
     if (!isRestricted) {
+      if (!isExpanded && onViewDetails) {
+        onViewDetails(company);
+      }
       setIsExpanded(!isExpanded);
     }
   };

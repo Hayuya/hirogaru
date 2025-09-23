@@ -11,6 +11,7 @@ import type { AuthState } from '../types/auth';
 import './TopPage.css';
 import { LineUserDetailForm } from '../components/LineUserDetailForm';
 import { createLineUserDetail, getLineUserDetail } from '../api/lineUserDetailApi';
+import { logLineAction } from '../api/lineActionApi';
 
 // 文字列/数値から数値を確実に抽出するヘルパー関数
 const parseNumericValue = (value: string | number): number => {
@@ -187,6 +188,13 @@ export const TopPage: React.FC = () => {
     }
   };
 
+  const handleCompanyDetailView = useCallback((company: Company) => {
+    if (!authState.lineUserId) return;
+
+    const actionName = `button_click-${company.company_name}`;
+    void logLineAction({ lineUserId: authState.lineUserId, actionName });
+  }, [authState.lineUserId]);
+
   // === レンダリング ===
   const isUserRestricted = !authState.isLoggedIn || !authState.isFriend;
 
@@ -220,6 +228,7 @@ export const TopPage: React.FC = () => {
             company={company}
             displayRank={index + 1}
             isRestricted={isUserRestricted && index >= 3}
+            onViewDetails={handleCompanyDetailView}
           />
         ))}
       </div>
