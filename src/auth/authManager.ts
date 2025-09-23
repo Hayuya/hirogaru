@@ -1,10 +1,8 @@
 import liff from '@line/liff';
 import type { AuthState } from '../types/auth';
 
-// LIFF IDを環境変数から取得
-const LIFF_ID = import.meta.env.VITE_LIFF_ID || '2008160071-7jkwxNXd';
-// 開発モードフラグ (ローカル環境での動作を模擬します)
-const IS_DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+// LIFF IDを環境変数から取得します。
+const LIFF_ID = import.meta.env.VITE_LIFF_ID;
 
 class AuthManager {
   private authState: AuthState = {
@@ -15,22 +13,12 @@ class AuthManager {
   };
 
   /**
-   * LIFFの初期化と自動ログイン処理
+   * LIFFの初期化とユーザーの自動識別
    */
   async initialize(): Promise<AuthState> {
-    // 開発モードが有効な場合、LIFFの通信を行わず模擬データを使用します
-    if (IS_DEV_MODE) {
-      console.log('🔧 開発モード: 模擬ユーザーでログイン状態を再現します。');
-      this.authState = {
-        isInitialized: true,
-        isLoggedIn: true,
-        user: {
-          userId: 'U_DEV_MOCK_USER_ID',
-          displayName: '開発用ユーザー',
-          pictureUrl: 'https://via.placeholder.com/100',
-        },
-        lineUserId: 'U_DEV_MOCK_USER_ID',
-      };
+    // LIFF IDが設定されていない場合は処理を中断します。
+    if (!LIFF_ID) {
+      console.error('LIFF Error: LIFF IDが設定されていません。');
       return this.authState;
     }
 
@@ -39,10 +27,8 @@ class AuthManager {
       await liff.init({ liffId: LIFF_ID });
       this.authState.isInitialized = true;
       
-      // ユーザーがLINEにログインしているかを確認します。
-      // LINEアプリ内のブラウザ（リッチメニューからのアクセスなど）であれば、ここは `true` になります。
+      // ユーザーがLINEにログインしているか（LINEアプリ内で閲覧しているか）を確認します。
       if (liff.isLoggedIn()) {
-        console.log('✅ LIFF: ログイン状態を確認しました。');
         this.authState.isLoggedIn = true;
         
         try {
@@ -55,31 +41,24 @@ class AuthManager {
           };
           // バックエンドAPIに渡すためのLINEユーザーIDをstateに保存します。
           this.authState.lineUserId = profile.userId;
-          console.log(`👤 ユーザーID: ${profile.userId} を取得しました。`);
         } catch (error) {
           console.error('LIFF Error: プロフィールの取得に失敗しました。', error);
-          // プロフィール取得に失敗した場合でも、コンテキストからユーザーIDの取得を試みます。
+          // 予備としてコンテキストからユーザーIDの取得を試みます。
           const context = liff.getContext();
           if (context?.userId) {
             this.authState.lineUserId = context.userId;
           }
         }
       } else {
-        // ユーザーがLINEにログインしていない場合（例：PCのブラウザでURLを直接開いた場合など）
-        // 何もせず「未ログイン」状態として処理を続行します。
-        console.log('ユーザーは未ログイン状態です。');
+        // PCのブラウザなど、LINE環境外からのアクセスの場合は「未ログイン」状態となります。
         this.authState.isLoggedIn = false;
       }
     } catch (error) {
       console.error('LIFF Error: 初期化に失敗しました。', error);
-      this.authState.isInitialized = false;
     }
     
     return this.authState;
   }
-
-  // UIからログインボタンが削除されたため、手動ログイン・ログアウト処理は不要になりました。
-  // 必要であれば再度実装しますが、現状の要件ではこれらのメソッドは使用されません。
 }
 
 export const authManager = new AuthManager();

@@ -8,7 +8,6 @@ import type { Company, SortOption } from '../types/company';
 import { fetchCompanies } from '../api/companyApi';
 import { authManager } from '../auth/authManager';
 import type { AuthState } from '../types/auth';
-import { axiosClient } from '../api/axiosClient'; // axiosClientを直接利用するためにインポート
 import './TopPage.css';
 
 export const TopPage: React.FC = () => {
@@ -33,36 +32,28 @@ export const TopPage: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  
-  // 開発用の全件ランダム表示モードかどうかを管理するState
-  const [isDevRandomMode, setIsDevRandomMode] = useState(false);
 
-  // LIFF初期化
+  // LIFF初期化と認証
   useEffect(() => {
-    const initLiff = async () => {
-      try {
-        const state = await authManager.initialize();
-        setAuthState(state);
-      } catch (error) {
-        console.error('LIFF initialization failed:', error);
-      }
+    const initAuth = async () => {
+      const state = await authManager.initialize();
+      setAuthState(state);
     };
-    initLiff();
+    initAuth();
   }, []);
 
-  // 企業データの初回・フィルター変更時読み込み
+  // 企業データの読み込みトリガー
   useEffect(() => {
-    // 開発用モードが有効な場合は、このeffectを実行しない
-    if (isDevRandomMode) return;
+    // 認証が完了（lineUserIdが確定）してからデータ取得を開始
+    if (authState.isInitialized) {
+      const handler = setTimeout(() => {
+        loadCompanies(true); // 条件が変更されたらリセットして読み込み
+      }, 500);
+      return () => clearTimeout(handler);
+    }
+  }, [selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder, authState.isInitialized]);
 
-    const handler = setTimeout(() => {
-      loadCompanies(true); // フィルターやソートが変更されたらリセットして読み込み
-    }, 500);
-
-    return () => clearTimeout(handler);
-  }, [selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter, currentSort, sortOrder, authState.lineUserId, isDevRandomMode]);
-
-  // 通常のデータ読み込み（ページネーション対応）
+  // 企業データを取得する関数
   const loadCompanies = async (reset: boolean = false) => {
     setLoading(true);
     setError(null);
@@ -72,7 +63,7 @@ export const TopPage: React.FC = () => {
       const params = {
         skip: currentSkip,
         limit: 20,
-        line_user_id: authState.lineUserId,
+        line_user_id: authState.lineUserId, // ログイン済みならIDが、未ログインならnullが渡される
         sort: currentSort,
         order: sortOrder,
         industry: selectedIndustries.length > 0 ? selectedIndustries.join(',') : undefined,
@@ -88,75 +79,26 @@ export const TopPage: React.FC = () => {
       setHasMore(data.length >= 20);
     } catch (error) {
       console.error('Failed to load companies:', error);
-      setError('企業データの読み込みに失敗しました。');
+      setError('企業データの読み込みに失敗しました。時間をおいて再度お試しください。');
     } finally {
       setLoading(false);
     }
   };
-  
-  // 【開発用】全件取得してシャッフルする関数
-  const handleFetchAndShuffleAll = async () => {
-    setLoading(true);
-    setError(null);
-    setIsDevRandomMode(true); // 開発用モードに設定
-    setHasMore(false); // 無限スクロールを停止
 
-    try {
-      // 既存のaxiosClientを使って直接APIを叩く
-      const response = await axiosClient.get<Company[]>('/companies');
-      const allCompanies = response.data;
-      
-      // 配列をシャッフル (Fisher-Yates algorithm)
-      for (let i = allCompanies.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allCompanies[i], allCompanies[j]] = [allCompanies[j], allCompanies[i]];
-      }
-      
-      setCompanies(allCompanies);
-    } catch (e) {
-      console.error('Failed to fetch all companies for dev:', e);
-      setError('全件取得に失敗しました。');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  // 通常モードに戻すための共通処理
-  const switchToNormalMode = (callback: Function) => {
-    setIsDevRandomMode(false);
-    callback();
-  };
-
-  // Intersection Observer の設定
+  // 無限スクロール用の設定
   const observer = useRef<IntersectionObserver>();
   const lastCompanyElementRef = useCallback((node: HTMLDivElement | null) => {
-    if (loading || isDevRandomMode) return; // 開発モード中は無限スクロールしない
+    if (loading) return;
     if (observer.current) observer.current.disconnect();
-
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore) {
         loadCompanies(false); // 追加読み込み
       }
     });
-
     if (node) observer.current.observe(node);
-  }, [loading, hasMore, isDevRandomMode]);
+  }, [loading, hasMore]);
 
-  const isUserRestricted = !authState.isLoggedIn || !authState.lineUserId;
-  
-  const devButtonStyle: React.CSSProperties = {
-    padding: '8px 16px',
-    background: '#ffc107',
-    color: 'black',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginBottom: '16px',
-    fontWeight: 'bold',
-    display: 'block',
-    width: '100%',
-    textAlign: 'center',
-  };
+  const isUserRestricted = !authState.isLoggedIn;
 
   return (
     <div className="top-page">
@@ -165,21 +107,17 @@ export const TopPage: React.FC = () => {
       
       <main className="main-content">
         <div className="container">
-          <button style={devButtonStyle} onClick={handleFetchAndShuffleAll}>
-            【開発用】全件取得してランダム表示
-          </button>
-
           <FilterBar
             selectedIndustries={selectedIndustries}
             femaleRatioFilter={femaleRatioFilter}
             relocationFilter={relocationFilter}
             specialLeaveFilter={specialLeaveFilter}
             housingAllowanceFilter={housingAllowanceFilter}
-            onIndustryChange={(industries) => switchToNormalMode(() => setSelectedIndustries(industries))}
-            onFemaleRatioChange={(checked) => switchToNormalMode(() => setFemaleRatioFilter(checked))}
-            onRelocationChange={(checked) => switchToNormalMode(() => setRelocationFilter(checked))}
-            onSpecialLeaveChange={(checked) => switchToNormalMode(() => setSpecialLeaveFilter(checked))}
-            onHousingAllowanceChange={(checked) => switchToNormalMode(() => setHousingAllowanceFilter(checked))}
+            onIndustryChange={setSelectedIndustries}
+            onFemaleRatioChange={setFemaleRatioFilter}
+            onRelocationChange={setRelocationFilter}
+            onSpecialLeaveChange={setSpecialLeaveFilter}
+            onHousingAllowanceChange={setHousingAllowanceFilter}
           />
           
           {companies.length > 0 && (
@@ -187,10 +125,10 @@ export const TopPage: React.FC = () => {
               currentSort={currentSort}
               sortOrder={sortOrder}
               totalCount={companies.length}
-              onSortChange={(sort, order) => switchToNormalMode(() => {
+              onSortChange={(sort, order) => {
                 setCurrentSort(sort);
                 setSortOrder(order);
-              })}
+              }}
             />
           )}
           
@@ -208,48 +146,19 @@ export const TopPage: React.FC = () => {
               <p>該当する企業が見つかりませんでした。</p>
             </div>
           ) : (
-            <>
-              <div className="companies-list">
-                {companies.map((company, index) => {
-                  const isLastElement = companies.length === index + 1;
-                  return (
-                    <div ref={isLastElement ? lastCompanyElementRef : null} key={company.id}>
-                      <CompanyCard
-                        company={company}
-                        isRestricted={isUserRestricted && index >= 3 && !isDevRandomMode}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-              
-              {isUserRestricted && companies.length > 3 && !isDevRandomMode && (
-                <div className="registration-prompt">
-                  <div className="prompt-content">
-                    <h3>すべての企業情報を見るには</h3>
-                    <p>LINEでログインして、100社以上の広島企業の詳細情報にアクセスしましょう。</p>
-                    <button 
-                      className="register-button" 
-                      onClick={() => authManager.login()}
-                    >
-                      LINEでログイン
-                    </button>
+            <div className="companies-list">
+              {companies.map((company, index) => {
+                const isLastElement = companies.length === index + 1;
+                return (
+                  <div ref={isLastElement ? lastCompanyElementRef : null} key={company.id}>
+                    <CompanyCard
+                      company={company}
+                      isRestricted={isUserRestricted && index >= 3}
+                    />
                   </div>
-                </div>
-              )}
-              
-              {loading && companies.length > 0 && (
-                <div className="loading-more">
-                  <div className="loading-spinner"></div>
-                </div>
-              )}
-              
-              {!hasMore && companies.length > 0 && !isDevRandomMode && (
-                <div className="end-of-list">
-                  <p>すべての企業を表示しました</p>
-                </div>
-              )}
-            </>
+                );
+              })}
+            </div>
           )}
         </div>
       </main>
