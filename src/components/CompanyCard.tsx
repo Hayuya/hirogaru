@@ -5,9 +5,10 @@ import './CompanyCard.css';
 interface CompanyCardProps {
   company: Company;
   isRestricted: boolean;
+  displayRank: number; // 親コンポーネントから渡される動的な順位
 }
 
-export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted }) => {
+export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted, displayRank }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpanded = () => {
@@ -16,32 +17,21 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted 
     }
   };
 
-  // 売上高をフォーマット
   const formatRevenue = (revenue: string) => {
     const num = parseFloat(revenue);
-    if (num >= 100000000000) {
-      return `${(num / 100000000000).toFixed(1)}兆円`;
-    } else if (num >= 100000000) {
-      return `${(num / 100000000).toFixed(0)}億円`;
-    } else if (num >= 10000000) {
-      return `${(num / 10000000).toFixed(0)}千万円`;
-    } else {
-      return `${(num / 10000).toFixed(0)}万円`;
-    }
+    if (num >= 100000000000) return `${(num / 100000000000).toFixed(1)}兆円`;
+    if (num >= 100000000) return `${(num / 100000000).toFixed(0)}億円`;
+    if (num >= 10000000) return `${(num / 10000000).toFixed(0)}千万円`;
+    return `${(num / 10000).toFixed(0)}万円`;
   };
 
-  // 評価の星を表示
   const renderRating = (rating: number) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push('★');
-    }
-    if (hasHalfStar && fullStars < 5) {
-      stars.push('☆');
-    }
+    for (let i = 0; i < fullStars; i++) stars.push('★');
+    if (hasHalfStar && fullStars < 5) stars.push('☆');
     return stars.join('');
   };
 
@@ -49,7 +39,8 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted 
     <div className={`company-card ${isRestricted ? 'restricted' : ''}`}>
       <div className="card-header">
         <div className="rank-badge">
-          <span className="rank-number">{company.rank}</span>
+          {/* company.rank の代わりに displayRank を使用 */}
+          <span className="rank-number">{displayRank}</span>
           <span className="rank-label">位</span>
         </div>
         <div className="company-basic-info">
@@ -94,52 +85,29 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted 
           </div>
         ) : (
           <>
-            <button 
-              className="expand-button" 
-              onClick={toggleExpanded}
-              aria-expanded={isExpanded}
-            >
+            <button className="expand-button" onClick={toggleExpanded} aria-expanded={isExpanded}>
               {isExpanded ? '詳細を閉じる' : '詳細を見る'}
               <span className="expand-icon">{isExpanded ? '▲' : '▼'}</span>
             </button>
 
             {isExpanded && (
               <div className="expanded-content">
+                {/* ... (以下の部分は変更なし) ... */}
                 <div className="detail-section">
                   <h4 className="detail-title">企業概要</h4>
                   <p className="detail-text">{company.company_overview_120}</p>
                 </div>
-
                 <div className="detail-section">
                   <h4 className="detail-title">基本情報</h4>
                   <div className="detail-grid">
-                    <div className="detail-item">
-                      <span className="detail-label">本社所在地</span>
-                      <span className="detail-value">{company.headquarters_address}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">従業員数</span>
-                      <span className="detail-value">{company.number_of_employees}名</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">売上高</span>
-                      <span className="detail-value">{formatRevenue(company.revenue)}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">男女比率</span>
-                      <span className="detail-value">{company.gender_ratio}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">平均年齢</span>
-                      <span className="detail-value">{company.average_age}歳</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">平均勤続年数</span>
-                      <span className="detail-value">{company.average_years_of_service}年</span>
-                    </div>
+                    <div className="detail-item"><span className="detail-label">本社所在地</span><span className="detail-value">{company.headquarters_address}</span></div>
+                    <div className="detail-item"><span className="detail-label">従業員数</span><span className="detail-value">{company.number_of_employees}名</span></div>
+                    <div className="detail-item"><span className="detail-label">売上高</span><span className="detail-value">{formatRevenue(company.revenue)}</span></div>
+                    <div className="detail-item"><span className="detail-label">男女比率</span><span className="detail-value">{company.gender_ratio}</span></div>
+                    <div className="detail-item"><span className="detail-label">平均年齢</span><span className="detail-value">{company.average_age}歳</span></div>
+                    <div className="detail-item"><span className="detail-label">平均勤続年数</span><span className="detail-value">{company.average_years_of_service}年</span></div>
                   </div>
                 </div>
-
                 <div className="detail-section">
                   <h4 className="detail-title">待遇・福利厚生</h4>
                   <div className="welfare-grid">
@@ -160,39 +128,12 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted 
                     </div>
                   </div>
                 </div>
-
-                <div className="detail-section">
-                  <h4 className="detail-title">強み・特徴</h4>
-                  <p className="detail-text">{company.strengths_unique_points}</p>
-                </div>
-
-                <div className="detail-section">
-                  <h4 className="detail-title">今後の展望</h4>
-                  <p className="detail-text">{company.future_prospects}</p>
-                </div>
-
-                <div className="detail-section">
-                  <h4 className="detail-title">募集要項</h4>
-                  <p className="detail-text">{company.job_openings_excerpt}</p>
-                </div>
-
+                <div className="detail-section"><h4 className="detail-title">強み・特徴</h4><p className="detail-text">{company.strengths_unique_points}</p></div>
+                <div className="detail-section"><h4 className="detail-title">今後の展望</h4><p className="detail-text">{company.future_prospects}</p></div>
+                <div className="detail-section"><h4 className="detail-title">募集要項</h4><p className="detail-text">{company.job_openings_excerpt}</p></div>
                 <div className="action-buttons">
-                  <a 
-                    href={company.official_website_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="action-button primary"
-                  >
-                    企業サイトを見る
-                  </a>
-                  <a 
-                    href={company.recruitment_page_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="action-button secondary"
-                  >
-                    採用情報を見る
-                  </a>
+                  <a href={company.official_website_url} target="_blank" rel="noopener noreferrer" className="action-button primary">企業サイトを見る</a>
+                  <a href={company.recruitment_page_url} target="_blank" rel="noopener noreferrer" className="action-button secondary">採用情報を見る</a>
                 </div>
               </div>
             )}
