@@ -13,6 +13,11 @@ interface FilterBarProps {
   onRelocationChange: (checked: boolean) => void;
   onSpecialLeaveChange: (checked: boolean) => void;
   onHousingAllowanceChange: (checked: boolean) => void;
+  onIndustryClick?: (industry: string, willSelect: boolean) => void;
+  onOtherFilterClick?: (
+    filterKey: 'femaleRatio' | 'relocation' | 'specialLeave' | 'housingAllowance',
+    willSelect: boolean
+  ) => void;
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
@@ -26,12 +31,17 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onRelocationChange,
   onSpecialLeaveChange,
   onHousingAllowanceChange,
+  onIndustryClick,
+  onOtherFilterClick,
 }) => {
   const handleIndustryClick = (industry: string) => {
-    if (selectedIndustries.includes(industry)) {
-      onIndustryChange(selectedIndustries.filter(i => i !== industry));
-    } else {
+    const willSelect = !selectedIndustries.includes(industry);
+    onIndustryClick?.(industry, willSelect);
+
+    if (willSelect) {
       onIndustryChange([...selectedIndustries, industry]);
+    } else {
+      onIndustryChange(selectedIndustries.filter(i => i !== industry));
     }
   };
 
@@ -67,7 +77,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <input
               type="checkbox"
               checked={femaleRatioFilter}
-              onChange={(e) => onFemaleRatioChange(e.target.checked)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                onOtherFilterClick?.('femaleRatio', checked);
+                onFemaleRatioChange(checked);
+              }}
             />
             <span>女性比率30%以上</span>
           </label>
@@ -75,7 +89,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <input
               type="checkbox"
               checked={relocationFilter}
-              onChange={(e) => onRelocationChange(e.target.checked)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                onOtherFilterClick?.('relocation', checked);
+                onRelocationChange(checked);
+              }}
             />
             <span>転勤なし</span>
           </label>
@@ -83,7 +101,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <input
               type="checkbox"
               checked={specialLeaveFilter}
-              onChange={(e) => onSpecialLeaveChange(e.target.checked)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                onOtherFilterClick?.('specialLeave', checked);
+                onSpecialLeaveChange(checked);
+              }}
             />
             <span>特別休暇あり</span>
           </label>
@@ -91,7 +113,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <input
               type="checkbox"
               checked={housingAllowanceFilter}
-              onChange={(e) => onHousingAllowanceChange(e.target.checked)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                onOtherFilterClick?.('housingAllowance', checked);
+                onHousingAllowanceChange(checked);
+              }}
             />
             <span>住宅手当あり</span>
           </label>

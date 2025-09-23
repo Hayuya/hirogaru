@@ -22,6 +22,13 @@ const SORT_LABEL_MAP: Record<SortOption, string> = {
   average_age: '平均年齢',
 };
 
+const OTHER_FILTER_LABEL_MAP: Record<'femaleRatio' | 'relocation' | 'specialLeave' | 'housingAllowance', string> = {
+  femaleRatio: '女性比率30%以上',
+  relocation: '転勤なし',
+  specialLeave: '特別休暇あり',
+  housingAllowance: '住宅手当あり',
+};
+
 // 文字列/数値から数値を確実に抽出するヘルパー関数
 const parseNumericValue = (value: string | number): number => {
   if (typeof value === 'number') return value;
@@ -212,6 +219,21 @@ export const TopPage: React.FC = () => {
     void logLineAction({ lineUserId: authState.lineUserId, actionName });
   }, [authState.lineUserId]);
 
+  const handleIndustryFilterClick = useCallback((industry: string, _willSelect: boolean) => {
+    if (!authState.lineUserId) return;
+
+    const actionName = `button_click_gyokai_category-${industry}`;
+    void logLineAction({ lineUserId: authState.lineUserId, actionName });
+  }, [authState.lineUserId]);
+
+  const handleOtherFilterClick = useCallback((filterKey: 'femaleRatio' | 'relocation' | 'specialLeave' | 'housingAllowance', _willSelect: boolean) => {
+    if (!authState.lineUserId) return;
+
+    const label = OTHER_FILTER_LABEL_MAP[filterKey];
+    const actionName = `button_click_others${label}`;
+    void logLineAction({ lineUserId: authState.lineUserId, actionName });
+  }, [authState.lineUserId]);
+
   // === レンダリング ===
   const isUserRestricted = !authState.isLoggedIn || !authState.isFriend;
 
@@ -301,6 +323,8 @@ export const TopPage: React.FC = () => {
                 onRelocationChange={(v) => setFilters(f => ({ ...f, relocationFilter: v }))}
                 onSpecialLeaveChange={(v) => setFilters(f => ({ ...f, specialLeaveFilter: v }))}
                 onHousingAllowanceChange={(v) => setFilters(f => ({ ...f, housingAllowanceFilter: v }))}
+                onIndustryClick={handleIndustryFilterClick}
+                onOtherFilterClick={handleOtherFilterClick}
               />
               <SortBar
                 currentSort={sort.key}
