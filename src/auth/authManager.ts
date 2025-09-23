@@ -13,6 +13,7 @@ class AuthManager {
     isFriend: false,
     error: null,
   };
+  private hasLoggedRichMenuClick = false;
 
   async initialize(): Promise<AuthState> {
     if (!LIFF_ID) {
@@ -40,14 +41,14 @@ class AuthManager {
         };
         this.authState.lineUserId = profile.userId;
 
-        // ▼▼▼ ここから追加 ▼▼▼
-        // RichMenuClickアクションをサーバーに記録
-        // 初期化処理をブロックしないように、awaitせず実行
-        logLineAction({
-          lineUserId: profile.userId,
-          actionName: 'RichMenuClick',
-        });
-        // ▲▲▲ ここまで追加 ▲▲▲
+        // RichMenuClickアクションを初回アクセス時に記録
+        if (!this.hasLoggedRichMenuClick) {
+          this.hasLoggedRichMenuClick = true;
+          void logLineAction({
+            lineUserId: profile.userId,
+            actionName: 'RichMenuClick',
+          });
+        }
 
         if (friendship.friendFlag) {
           console.log('✅ ユーザーは公式アカウントの友だちです。');
