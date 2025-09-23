@@ -1,0 +1,368 @@
+/* hayuya/jdb/jdb-8592bceda6e76a80e30644a57bd00124caaafb91/frontend/src/components/CompanyCard.css */
+
+.company-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 1px solid var(--border-color); /* 追加 */
+}
+
+.company-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--secondary-light); /* 変更 */
+}
+
+.company-card.restricted {
+  opacity: 0.95;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rank-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: var(--primary-color); /* 変更: グラデーションから単色へ */
+  color: white;
+  border-radius: 12px;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.rank-number {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.rank-label {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.company-basic-info {
+  flex: 1;
+}
+
+.company-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.company-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.industry-badge {
+  padding: 4px 10px;
+  background: var(--primary-light); /* 変更 */
+  color: var(--primary-dark); /* 変更 */
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.rating-stars {
+  color: #FFB800;
+}
+
+.rating-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.review-count {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.card-body {
+  padding: 20px;
+  position: relative;
+}
+
+.key-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 16px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.info-value.highlight {
+  color: var(--primary-color);
+}
+
+.expand-button {
+  width: 100%;
+  padding: 10px;
+  background: var(--primary-light); /* 変更 */
+  color: var(--primary-color);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.expand-button:hover {
+  background: var(--secondary-light); /* 変更 */
+  color: var(--primary-dark);
+}
+
+.expand-icon {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.expanded-content {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+.detail-section {
+  margin-bottom: 24px;
+}
+
+.detail-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--primary-color);
+  display: inline-block;
+}
+
+.detail-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dotted var(--border-color);
+}
+
+.detail-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.detail-value {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.welfare-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.welfare-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.welfare-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.welfare-value {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.welfare-extra {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.welfare-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.tag {
+  padding: 4px 12px;
+  background: var(--secondary-light); /* 変更 */
+  color: var(--primary-dark); /* 変更 */
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.action-button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.action-button.primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.action-button.primary:hover {
+  background: var(--primary-dark);
+  text-decoration: none;
+}
+
+.action-button.secondary {
+  background: white;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.action-button.secondary:hover {
+  background: var(--primary-light);
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.restricted-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.restricted-message {
+  text-align: center;
+  padding: 20px;
+}
+
+.lock-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.restricted-message p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .card-header {
+    padding: 16px;
+  }
+  
+  .rank-badge {
+    width: 50px;
+    height: 50px;
+    margin-right: 16px;
+  }
+  
+  .rank-number {
+    font-size: 20px;
+  }
+  
+  .company-name {
+    font-size: 16px;
+  }
+  
+  .key-info {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}

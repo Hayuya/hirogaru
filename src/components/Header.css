@@ -1,0 +1,173 @@
+/* hayuya/jdb/jdb-8592bceda6e76a80e30644a57bd00124caaafb91/frontend/src/components/Header.css */
+
+.header {
+  /* 変更: グラデーションから白背景へ */
+  background: var(--card-background);
+  color: var(--text-primary); /* 変更: 文字色を白からプライマリテキストカラーへ */
+  padding: 0;
+  box-shadow: var(--shadow-sm); /* 変更: 影を少し薄く */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border-color); /* 追加: 画像に合わせて線を追加 */
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.header-logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-primary); /* 変更 */
+  margin: 0;
+}
+
+.header-nav {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link {
+  color: var(--text-secondary); /* 変更 */
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--primary-color); /* 変更 */
+  text-decoration: none;
+}
+
+.nav-link.active {
+  color: var(--primary-color); /* 変更 */
+  font-weight: 600; /* 追加 */
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--primary-color); /* 変更 */
+  border-radius: 2px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color); /* 変更 */
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary); /* 追加 */
+}
+
+.login-button {
+  background-color: var(--primary-color); /* 変更 */
+  color: white; /* 変更 */
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.login-button:hover {
+  background-color: var(--primary-dark); /* 変更 */
+  transform: translateY(-1px);
+}
+
+/* LINEアイコンは緑のままなので変更なし */
+.login-button::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2306C755"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.19 0 2.34-.21 3.41-.6.3-.11.49-.4.49-.72 0-.44-.36-.8-.8-.8-.17 0-.33.06-.46.11-.86.31-1.76.47-2.64.47-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8c0 .88-.16 1.78-.47 2.64-.05.13-.11.29-.11.46 0 .44.36.8.8.8.32 0 .61-.19.72-.49.39-1.07.6-2.22.6-3.41 0-5.52-4.48-10-10-10z"/><path d="M17 10h-5V5c0-.55-.45-1-1-1s-1 .45-1 1v5H5c-.55 0-1 .45-1 1s.45 1 1 1h5v5c0 .55.45 1 1 1s1-.45 1-1v-5h5c.55 0 1-.45 1-1s-.45-1-1-1z"/></svg>') center/contain no-repeat;
+}
+
+.logout-button {
+  background-color: var(--primary-light); /* 変更 */
+  color: var(--primary-dark); /* 変更 */
+  padding: 6px 16px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid var(--secondary-light); /* 変更 */
+}
+
+.logout-button:hover {
+  background-color: var(--secondary-light); /* 変更 */
+  color: var(--primary-dark);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    gap: 16px;
+    padding: 12px 16px;
+  }
+  
+  .header-left {
+    flex-direction: column;
+    width: 100%;
+    gap: 16px;
+  }
+  
+  .header-nav {
+    width: 100%;
+    justify-content: space-around;
+  }
+  
+  .nav-link {
+    font-size: 13px;
+  }
+  
+  .header-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

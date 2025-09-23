@@ -1,0 +1,167 @@
+/* hayuya/jdb/jdb-8592bceda6e76a80e30644a57bd00124caaafb91/frontend/src/components/HeroSection.css */
+
+.hero-section {
+  /* 背景色は不要になり、画像とオーバーレイが背景となる */
+  background: var(--background-color); /* フォールバック色として残しておく */
+  color: var(--card-background); /* 変更: テキスト色を白に */
+  padding: 60px 0;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-color);
+  min-height: 400px; /* 適切な高さを確保 */
+  display: flex; /* flexboxでコンテンツを中央寄せしやすく */
+  align-items: center; /* 垂直方向中央寄せ */
+  justify-content: center; /* 水平方向中央寄せ */
+  text-align: center; /* テキストを中央寄せ */
+}
+
+/* 背景画像コンテナ */
+.hero-background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover; /* 画像をコンテナに合わせて拡大・縮小 */
+  background-position: center 30%; /* 画像の表示位置を調整（中央より少し上） */
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+/* 文字を見やすくするためのオーバーレイ */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 変更: グラデーションで下の方を透過させ、文字を見やすくする */
+  background: linear-gradient(to bottom, rgba(0, 88, 94, 0.7), rgba(0, 88, 94, 0.5) 50%, rgba(0, 88, 94, 0.3) 80%, rgba(0, 88, 94, 0.2));
+  z-index: 1;
+}
+
+.hero-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 2; /* オーバーレイより手前に配置 */
+  width: 100%; /* コンテンツが中央に表示されるように */
+}
+
+.hero-content {
+  text-align: center;
+  margin-bottom: 48px;
+  color: white; /* 変更: 文字色を白に */
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
+  animation: fadeInUp 0.6s ease-out;
+  color: white; /* 変更 */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 文字の影を追加して視認性向上 */
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  margin-bottom: 12px;
+  opacity: 0.95;
+  animation: fadeInUp 0.6s ease-out 0.1s backwards;
+  color: white; /* 変更 */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.hero-description {
+  font-size: 16px;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+  animation: fadeInUp 0.6s ease-out 0.2s backwards;
+  color: white; /* 変更 */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  animation: fadeInUp 0.6s ease-out 0.3s backwards;
+  color: white; /* 変更 */
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-number {
+  font-size: 36px;
+  font-weight: bold;
+  color: white; /* 変更 */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+  color: white; /* 変更 */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 0;
+    min-height: 300px; /* モバイルでの高さ調整 */
+  }
+  
+  .hero-title {
+    font-size: 32px;
+  }
+  
+  .hero-subtitle {
+    font-size: 18px;
+  }
+  
+  .hero-description {
+    font-size: 14px;
+  }
+  
+  .hero-stats {
+    gap: 30px;
+  }
+  
+  .stat-number {
+    font-size: 28px;
+  }
+  
+  .stat-label {
+    font-size: 12px;
+  }
+
+  /* モバイルでは背景の位置を調整したり、オーバーレイを濃くしたりする */
+  .hero-background-image {
+    background-position: center center; /* モバイルでは中央寄せに */
+  }
+
+  .hero-overlay {
+    /* モバイルでは少し濃いめのオーバーレイにするなど調整可能 */
+    background: linear-gradient(to bottom, rgba(0, 88, 94, 0.8), rgba(0, 88, 94, 0.6) 50%, rgba(0, 88, 94, 0.4) 80%, rgba(0, 88, 94, 0.3));
+  }
+}

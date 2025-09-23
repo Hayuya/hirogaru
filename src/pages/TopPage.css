@@ -1,0 +1,145 @@
+/* hayuya/jdb/jdb-8592bceda6e76a80e30644a57bd00124caaafb91/frontend/src/pages/TopPage.css */
+
+.top-page {
+  min-height: 100vh;
+  background-color: var(--background-color);
+}
+
+.main-content {
+  padding: 40px 0;
+}
+
+.companies-list {
+  margin-bottom: 40px;
+}
+
+.error-container {
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.error-message {
+  color: #DC3545;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.retry-button {
+  padding: 10px 24px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.no-results p {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.no-results p:last-child {
+  margin-bottom: 0;
+}
+
+.registration-prompt {
+  margin: 40px 0;
+  padding: 40px;
+  /* 変更: グラデーションから単色のメインカラーへ */
+  background: var(--primary-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.prompt-content {
+  text-align: center;
+  color: white;
+}
+
+.prompt-content h3 {
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.prompt-content p {
+  font-size: 16px;
+  margin-bottom: 24px;
+  opacity: 0.95;
+}
+
+.register-button {
+  padding: 12px 32px;
+  background: white;
+  color: var(--primary-color);
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.register-button::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2306C755"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15h-2v-3h2v-1.5C10 8.57 11.57 7 13.5 7H16v3h-2c-.55 0-1 .45-1 1v1h3l-.5 3H13v6.95c5.05-.5 9-4.76 9-9.95 0-5.52-4.48-10-10-10z"/></svg>') center/contain no-repeat;
+}
+
+.register-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.loading-more {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.end-of-list {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 20px 0;
+  }
+  
+  .registration-prompt {
+    padding: 24px;
+    margin: 20px 0;
+  }
+  
+  .prompt-content h3 {
+    font-size: 20px;
+  }
+  
+  .prompt-content p {
+    font-size: 14px;
+  }
+}
