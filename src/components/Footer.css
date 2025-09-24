@@ -1,7 +1,8 @@
+
 .site-footer {
   margin-top: 64px;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #033D2A;
+  color: #E6F4ED;
   padding: 40px 24px;
 }
 
@@ -28,7 +29,7 @@
 .footer-description {
   margin: 0;
   font-size: 14px;
-  color: #cbd5f5;
+  color: #CDEBDC;
 }
 
 .footer-links {
@@ -37,19 +38,19 @@
 }
 
 .footer-links a {
-  color: #cbd5f5;
+  color: #CDEBDC;
   font-size: 14px;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .footer-links a:hover {
-  color: #ffffff;
+  color: #FFFFFF;
 }
 
 .footer-copy {
   font-size: 12px;
-  color: #94a3b8;
+  color: #8BBFA3;
 }
 
 @media (max-width: 768px) {
