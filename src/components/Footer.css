@@ -1,8 +1,8 @@
 
 .site-footer {
   margin-top: 64px;
-  background: #033D2A;
-  color: #E6F4ED;
+  background: #102D52;
+  color: #E8F0FA;
   padding: 40px 24px;
 }
 
@@ -29,7 +29,7 @@
 .footer-description {
   margin: 0;
   font-size: 14px;
-  color: #CDEBDC;
+  color: #C3D5EA;
 }
 
 .footer-links {
@@ -38,7 +38,7 @@
 }
 
 .footer-links a {
-  color: #CDEBDC;
+  color: #C3D5EA;
   font-size: 14px;
   text-decoration: none;
   transition: color 0.2s ease;
@@ -50,7 +50,7 @@
 
 .footer-copy {
   font-size: 12px;
-  color: #8BBFA3;
+  color: #90A7C5;
 }
 
 @media (max-width: 768px) {

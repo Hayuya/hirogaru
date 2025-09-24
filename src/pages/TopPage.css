@@ -103,7 +103,7 @@
   display: inline-block;
   width: 24px;
   height: 24px;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2306C755"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15h-2v-3h2v-1.5C10 8.57 11.57 7 13.5 7H16v3h-2c-.55 0-1 .45-1 1v1h3l-.5 3H13v6.95c5.05-.5 9-4.76 9-9.95 0-5.52-4.48-10-10-10z"/></svg>') center/contain no-repeat;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232F6AA6"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15h-2v-3h2v-1.5C10 8.57 11.57 7 13.5 7H16v3h-2c-.55 0-1 .45-1 1v1h3l-.5 3H13v6.95c5.05-.5 9-4.76 9-9.95 0-5.52-4.48-10-10-10z"/></svg>') center/contain no-repeat;
 }
 
 .register-button:hover {
@@ -166,7 +166,7 @@
 .line-user-detail-form input:focus {
   border-color: var(--primary-color);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+  box-shadow: 0 0 0 3px rgba(31, 75, 140, 0.2);
 }
 
 .line-user-detail-form .form-error {
@@ -253,9 +253,9 @@
 .line-user-detail-success {
   margin: 20px 0 40px;
   padding: 20px 24px;
-  background: #f0fdf4;
-  border: 1px solid #86efac;
-  color: #166534;
+  background: #EEF3FF;
+  border: 1px solid #A8C4F5;
+  color: #1E3F73;
   border-radius: 12px;
   font-weight: 600;
 }

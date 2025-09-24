@@ -8,17 +8,17 @@
 }
 
 :root {
-  /* カラーパレットをロイヤルグリーンベースに調整 */
-  --primary-color: #0B6A3C; /* ロイヤルグリーン */
-  --primary-dark: #084C2B;  /* primary-colorのより深いトーン */
-  --primary-light: #E6F4ED; /* 柔らかいグリーンの淡色 */
-  --secondary-color: #0B6A3C; /* secondaryもprimaryに統一 */
-  --secondary-light: #8ED1AC; /* 補助的に使うミントグリーン */
-  --background-color: #F5F7FA;
+  /* カラーパレットを落ち着いたブルーベースに調整 */
+  --primary-color: #1F4B8C; /* 穏やかなディープブルー */
+  --primary-dark: #163868;  /* primary-colorのより深いトーン */
+  --primary-light: #E6EEF8; /* 柔らかいブルーの淡色 */
+  --secondary-color: #2F6AA6; /* アクセント用のブルー */
+  --secondary-light: #96B8DB; /* 補助的に使うパステルブルー */
+  --background-color: #F3F6FB;
   --card-background: #FFFFFF;
-  --text-primary: #2C3E50;
-  --text-secondary: #6C757D;
-  --border-color: #E0E6ED;
+  --text-primary: #1F2D3D;
+  --text-secondary: #5F718A;
+  --border-color: #D5E1F0;
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
   --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.16);
