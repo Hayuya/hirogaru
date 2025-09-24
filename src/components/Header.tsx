@@ -1,36 +1,25 @@
 import React from 'react';
-import type { LiffUser } from '../types/auth';
 import './Header.css';
 
-interface HeaderProps {
-  user?: LiffUser | null;
-  isLoggedIn: boolean;
-}
-
-export const Header: React.FC<HeaderProps> = ({ user, isLoggedIn }) => {
+export const Header: React.FC = () => {
   return (
     <header className="header">
-      <div className="header-container">
-        <div className="header-left">
-          <h1 className="header-logo">  ジモトデ</h1>
-          <nav className="header-nav">
-            <a href="#" className="nav-link active">{/* 任意のナビゲーション */}</a>
-          </nav>
-        </div>
-        <div className="header-right">
-          {/* ▼▼▼ ここから変更 ▼▼▼ */}
-          <div className="login-status">
-            {isLoggedIn && user ? (
-              <>
-                <span>ログイン中 ID:</span>
-                <span className="user-id">{user.userId}</span>
-              </>
-            ) : (
-              <span>未ログイン</span>
-            )}
+      <div className="header-inner">
+        <nav className="header-nav">
+          <a href="#features" className="nav-link">特徴</a>
+          <a href="#companies" className="nav-link">企業一覧</a>
+          <a href="#support" className="nav-link">サポート</a>
+        </nav>
+
+        <div className="header-brand">
+          <span className="brand-mark">J</span>
+          <div className="brand-text">
+            <span className="brand-title">ジモトデ</span>
+            <span className="brand-subtitle">広島の就活パートナー</span>
           </div>
-          {/* ▲▲▲ ここまで変更 ▲▲▲ */}
         </div>
+
+        <a href="#contact" className="header-cta">個別相談</a>
       </div>
     </header>
   );

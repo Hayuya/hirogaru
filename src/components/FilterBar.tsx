@@ -35,13 +35,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onOtherFilterClick,
 }) => {
   const handleIndustryClick = (industry: string) => {
-    const willSelect = !selectedIndustries.includes(industry);
-    onIndustryClick?.(industry, willSelect);
+    const isSelected = selectedIndustries.includes(industry);
+    onIndustryClick?.(industry, !isSelected);
 
-    if (willSelect) {
-      onIndustryChange([...selectedIndustries, industry]);
+    if (isSelected) {
+      onIndustryChange([]);
     } else {
-      onIndustryChange(selectedIndustries.filter(i => i !== industry));
+      onIndustryChange([industry]);
     }
   };
 
@@ -61,6 +61,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {INDUSTRIES.map(industry => (
             <button
               key={industry}
+              type="button"
               className={`industry-tag ${selectedIndustries.includes(industry) ? 'active' : ''}`}
               onClick={() => handleIndustryClick(industry)}
             >
@@ -73,18 +74,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       <div className="filter-section">
         <h3 className="filter-title">その他の条件</h3>
         <div className="checkbox-filters">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={femaleRatioFilter}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                onOtherFilterClick?.('femaleRatio', checked);
-                onFemaleRatioChange(checked);
-              }}
-            />
-            <span>女性比率30%以上</span>
-          </label>
           <label className="checkbox-label">
             <input
               type="checkbox"
@@ -120,6 +109,18 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               }}
             />
             <span>住宅手当あり</span>
+          </label>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={femaleRatioFilter}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                onOtherFilterClick?.('femaleRatio', checked);
+                onFemaleRatioChange(checked);
+              }}
+            />
+            <span>女性比率30%以上</span>
           </label>
         </div>
       </div>

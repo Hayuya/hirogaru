@@ -141,7 +141,11 @@ export const TopPage: React.FC = () => {
       processed = processed.filter(c => selectedIndustries.includes(c.industry));
     }
     if (femaleRatioFilter) {
-      processed = processed.filter(c => (c.gender_ratio.match(/女性:(\d+)%/) || [])[1] >= '30');
+      processed = processed.filter(c => {
+        const match = c.gender_ratio.match(/女性:(\d+)%/);
+        const ratio = match ? parseInt(match[1], 10) : 0;
+        return ratio >= 30;
+      });
     }
     if (relocationFilter) processed = processed.filter(c => c.relocation === 'なし');
     if (specialLeaveFilter) processed = processed.filter(c => c.special_leave === 'あり');
@@ -300,7 +304,7 @@ export const TopPage: React.FC = () => {
           )}
         </div>
       )}
-      <Header user={authState.user} isLoggedIn={authState.isLoggedIn} />
+      <Header />
       <HeroSection />
       <main className="main-content">
         <div className="container">

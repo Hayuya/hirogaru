@@ -9,13 +9,48 @@ interface SortBarProps {
   onSortChange: (sort: SortOption, order: 'asc' | 'desc') => void;
 }
 
-const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'starting_salary_graduates', label: '初任給' },
-  { value: 'revenue', label: '売上高' },
-  { value: 'number_of_employees', label: '従業員数' },
-  { value: 'average_overtime_hours', label: '残業時間' },
-  { value: 'average_years_of_service', label: '平均勤続年数' },
-  { value: 'average_age', label: '平均年齢' },
+const sortOptions: {
+  value: SortOption;
+  label: string;
+  descLabel: string;
+  ascLabel: string;
+}[] = [
+  {
+    value: 'revenue',
+    label: '売上高',
+    descLabel: '売上高が高い順',
+    ascLabel: '売上高が低い順',
+  },
+  {
+    value: 'number_of_employees',
+    label: '従業員数',
+    descLabel: '従業員数が多い順',
+    ascLabel: '従業員数が少ない順',
+  },
+  {
+    value: 'starting_salary_graduates',
+    label: '初任給',
+    descLabel: '初任給が高い順',
+    ascLabel: '初任給が低い順',
+  },
+  {
+    value: 'average_years_of_service',
+    label: '平均勤続年数',
+    descLabel: '勤続年数が長い順',
+    ascLabel: '勤続年数が短い順',
+  },
+  {
+    value: 'average_age',
+    label: '平均年齢',
+    descLabel: '平均年齢が高い順',
+    ascLabel: '平均年齢が低い順',
+  },
+  {
+    value: 'average_overtime_hours',
+    label: '残業時間',
+    descLabel: '残業時間が長い順',
+    ascLabel: '残業時間が短い順',
+  },
 ];
 
 export const SortBar: React.FC<SortBarProps> = ({
@@ -46,13 +81,13 @@ export const SortBar: React.FC<SortBarProps> = ({
             key={option.value}
             className={`sort-button ${currentSort === option.value ? 'active' : ''}`}
             onClick={() => handleSortClick(option.value)}
+            aria-pressed={currentSort === option.value}
           >
-            {option.label}
-            {currentSort === option.value && (
-              <span className="sort-arrow">
-                {sortOrder === 'desc' ? '↓' : '↑'}
-              </span>
-            )}
+            {currentSort === option.value
+              ? sortOrder === 'desc'
+                ? option.descLabel
+                : option.ascLabel
+              : option.label}
           </button>
         ))}
       </div>
