@@ -92,6 +92,47 @@
   transform: translateY(-1px);
 }
 
+.friend-prompt {
+  background-color: #00B900; /* LINE green */
+  color: white;
+  text-align: center;
+  padding: 8px 16px;
+}
+
+.prompt-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.friend-prompt p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.add-friend-button {
+  background-color: white;
+  color: #00B900;
+  padding: 4px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.add-friend-button:hover {
+  background-color: #f0f0f0;
+  color: #00B900;
+  text-decoration: none;
+}
+
 @media (max-width: 768px) {
   .header-inner {
     flex-direction: column;
@@ -119,5 +160,13 @@
     width: 100%;
     padding: 12px 0;
     border-radius: 12px;
+  }
+
+  .prompt-inner {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .friend-prompt p {
+    font-size: 13px;
   }
 }

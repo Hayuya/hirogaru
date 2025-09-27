@@ -1,8 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TopPage } from './pages/TopPage';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Disclaimer } from './pages/Disclaimer';
-import { Footer, FooterRoute } from './components/Footer';
+import { Footer, type FooterRoute } from './components/Footer';
+import { Header } from './components/Header';
+import { authManager } from './auth/authManager';
+import type { AuthState } from './types/auth';
 import './App.css';
 
 type AppRoute = FooterRoute;
@@ -17,6 +20,17 @@ const resolveCurrentRoute = (): AppRoute => {
 
 function App() {
   const [route, setRoute] = useState<AppRoute>(() => resolveCurrentRoute());
+  const [authState, setAuthState] = useState<AuthState>({
+    isInitialized: false, isLoggedIn: false, user: null, lineUserId: null, isFriend: false, error: null,
+  });
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const state = await authManager.initialize();
+      setAuthState(state);
+    };
+    initAuth();
+  }, []);
 
   const handleNavigate = useCallback((path: AppRoute) => {
     if (window.location.pathname !== path) {
@@ -47,14 +61,19 @@ function App() {
       default:
         return (
           <>
-            <TopPage />
+            <TopPage authState={authState} />
             <Footer onNavigate={handleNavigate} />
           </>
         );
     }
-  }, [route, handleNavigate]);
+  }, [route, handleNavigate, authState]);
 
-  return <div className="App">{content}</div>;
+  return (
+    <div className="App">
+      <Header authState={authState} />
+      {content}
+    </div>
+  );
 }
 
 export default App;

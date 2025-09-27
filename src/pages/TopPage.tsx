@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Header } from '../components/Header';
 import { HeroSection } from '../components/HeroSection';
 import { FilterBar } from '../components/FilterBar';
 import { SortBar } from '../components/SortBar';
 import { CompanyCard } from '../components/CompanyCard';
 import type { Company, SortOption } from '../types/company';
 import { fetchCompanies } from '../api/companyApi';
-import { authManager } from '../auth/authManager';
 import type { AuthState } from '../types/auth';
 import './TopPage.css';
 import { LineUserDetailForm } from '../components/LineUserDetailForm';
@@ -37,11 +35,12 @@ const parseNumericValue = (value: string | number): number => {
   return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
 };
 
-export const TopPage: React.FC = () => {
+interface TopPageProps {
+  authState: AuthState;
+}
+
+export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   // === State管理 ===
-  const [authState, setAuthState] = useState<AuthState>({
-    isInitialized: false, isLoggedIn: false, user: null, lineUserId: null, isFriend: false, error: null,
-  });
   const [allCompanies, setAllCompanies] = useState<Company[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -106,30 +105,31 @@ export const TopPage: React.FC = () => {
   // === 初期化処理 ===
   useEffect(() => {
     const initApp = async () => {
-      const state = await authManager.initialize();
-      setAuthState(state);
       setDetailSuccessMessage(null);
 
-      if (state.isInitialized && !state.error) {
+      if (authState.isInitialized && !authState.error) {
+        setIsLoading(true);
         try {
-          const data = await fetchCompanies({ line_user_id: state.lineUserId });
+          const data = await fetchCompanies({ line_user_id: authState.lineUserId });
           setAllCompanies(data);
         } catch (err) {
           setApiError('企業データの読み込みに失敗しました。');
+        } finally {
+          setIsLoading(false);
         }
 
-        if (state.lineUserId) {
-          void loadLineUserDetail(state.lineUserId);
+        if (authState.lineUserId) {
+          void loadLineUserDetail(authState.lineUserId);
         } else {
           setDetailState('hidden');
         }
-      } else {
+      } else if (authState.isInitialized) {
         setDetailState('hidden');
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     initApp();
-  }, [loadLineUserDetail]);
+  }, [loadLineUserDetail, authState]);
 
   // === データ加工処理 (useMemo) ===
   const displayedCompanies = useMemo(() => {
@@ -260,7 +260,7 @@ export const TopPage: React.FC = () => {
         </div>
       );
     }
-    if (displayedCompanies.length === 0) {
+    if (displayedCompanies.length === 0 && !isLoading) {
       return <div className="no-results"><p>該当する企業が見つかりませんでした。</p></div>;
     }
     return (
@@ -304,7 +304,6 @@ export const TopPage: React.FC = () => {
           )}
         </div>
       )}
-      <Header />
       <HeroSection />
       <main className="main-content">
         <div className="container">

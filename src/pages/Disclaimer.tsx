@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { Header } from '../components/Header';
 import { Footer,type FooterRoute } from '../components/Footer';
 import './StaticPage.css';
 
@@ -14,7 +13,6 @@ export const Disclaimer: React.FC<DisclaimerProps> = ({ onNavigate }) => {
 
   return (
     <div className="static-page">
-      <Header />
       <main className="static-main">
         <div className="static-container">
           <h1 className="static-title">免責事項</h1>
