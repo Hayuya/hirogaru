@@ -133,6 +133,25 @@
   text-decoration: none;
 }
 
+.scroll-to-bottom-button {
+  background-color: white;
+  color: #00B900;
+  padding: 4px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+}
+
+.scroll-to-bottom-button:hover {
+  background-color: #f0f0f0;
+}
+
+
 @media (max-width: 768px) {
   .header-inner {
     flex-direction: column;

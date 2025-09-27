@@ -7,6 +7,13 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ authState }) => {
+  const scrollToLoginPrompt = () => {
+    const element = document.getElementById('login-prompt');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="header">
       {authState.isInitialized && !authState.isLoggedIn && (
@@ -15,9 +22,9 @@ export const Header: React.FC<HeaderProps> = ({ authState }) => {
             <p>
               LINE公式アカウントを友だち追加＆ログインで、すべての企業情報にフルアクセス！
             </p>
-            <a href="https://lin.ee/eiuBq0X" className="add-friend-button" target="_blank" rel="noopener noreferrer">
-              友だち追加する
-            </a>
+            <button onClick={scrollToLoginPrompt} className="scroll-to-bottom-button">
+              詳細を見る
+            </button>
           </div>
         </div>
       )}
