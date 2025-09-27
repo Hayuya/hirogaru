@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ authState }) => {
             <p>
               LINE公式アカウントを友だち追加して、すべての企業情報にフルアクセス！
             </p>
-            <a href="https://line.me/R/ti/p/2008160073-gw4lNyDZ" className="add-friend-button" target="_blank" rel="noopener noreferrer">
+            <a href="https://line.me/R/ti/p/@974yqsm" className="add-friend-button" target="_blank" rel="noopener noreferrer">
               友だち追加する
             </a>
           </div>

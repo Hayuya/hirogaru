@@ -314,7 +314,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
               <div className="prompt-content">
                 <h3>最新情報を受け取るには</h3>
                 <p>LINE公式アカウントの友だち追加がおすすめです。追加後、再度アクセスしてください。</p>
-                <a href="https://line.me/R/ti/p/2008160073-gw4lNyDZ" className="register-button" style={{ textDecoration: 'none' }}>
+                <a href="https://line.me/R/ti/p/@974yqsm" className="register-button" style={{ textDecoration: 'none' }}>
                   LINEで友だち追加する
                 </a>
               </div>
