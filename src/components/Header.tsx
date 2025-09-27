@@ -13,7 +13,7 @@ export const Header: React.FC<HeaderProps> = ({ authState }) => {
         <div className="friend-prompt">
           <div className="prompt-inner">
             <p>
-              LINE公式アカウントを友だち追加して、すべての企業情報にフルアクセス！
+              LINE公式アカウントを友だち追加＆ログインで、すべての企業情報にフルアクセス！
             </p>
             <a href="https://lin.ee/eiuBq0X" className="add-friend-button" target="_blank" rel="noopener noreferrer">
               友だち追加する

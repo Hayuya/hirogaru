@@ -312,8 +312,8 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
           {authState.isLoggedIn && !authState.isFriend && (
             <div className="registration-prompt">
               <div className="prompt-content">
-                <h3>最新情報を受け取るには</h3>
-                <p>LINE公式アカウントの友だち追加がおすすめです。追加後、再度アクセスしてください。</p>
+                <h3>すべての企業情報を見るには</h3>
+                <p>LINE公式アカウントを友だち追加し、そのLINEアカウントでログインしてください。すべての企業情報が閲覧可能になります。</p>
                 <a href="https://lin.ee/eiuBq0X" className="register-button" style={{ textDecoration: 'none' }}>
                   LINEで友だち追加する
                 </a>
@@ -348,23 +348,35 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
               )}
 
               {/* ★変更点5: 条件未達の場合、リストの後に案内を表示 */}
-              {shouldLockContent && (
-                <div className="login-prompt">
-                  <div className="prompt-content">
-                    <h3>4件目以降の企業を閲覧するには</h3>
-                    {!authState.isLoggedIn ? (
-                      <>
-                        <p>LINEアカウントでのログインが必要です。PCからも簡単にログインできます。</p>
-                        <button onClick={handleLogin} className="login-button">
-                          LINEでログインして続きを読む
-                        </button>
-                      </>
-                    ) : (
-                      <p>LINE公式アカウントの友だち追加が必要です。追加後、再度アクセスしてください。</p>
-                    )}
-                  </div>
-                </div>
-              )}
+{shouldLockContent && (
+  <div className="login-prompt">
+    <div className="prompt-content">
+      <h3>全企業の詳細情報を閲覧するには</h3>
+      {!authState.isLoggedIn ? (
+        <>
+          <p>
+            すべての企業情報をご覧いただくには、LINE公式アカウントの友だち追加と、そのアカウントでのログインが必要です。
+            初めての方は、画面上部の「友だち追加」ボタンからスマホで追加した後、ログインをお願いします。
+            スマートフォンで既に追加済みの場合も、PCで閲覧するには再度ログインをお願いします。
+          </p>
+          <button onClick={handleLogin} className="login-button">
+            LINEアカウントでログイン
+          </button>
+        </>
+      ) : (
+        <>
+          <p>
+            ログインありがとうございます。あと一歩です！
+            <br />
+            現在ログイン中のLINEアカウントで、私たちの公式アカウントを友だち追加してください。
+            <br />
+            追加後、このページを再読み込み（リロード）すると、すべての情報が表示されます。
+          </p>
+        </>
+      )}
+    </div>
+  </div>
+)}
             </>
           )}
         </div>
