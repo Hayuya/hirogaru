@@ -62,6 +62,16 @@ class AuthManager {
     
     return this.authState;
   }
+
+  /**
+   * LINEログインを開始します。
+   * 外部ブラウザの場合、LINEのログインページにリダイレクトします。
+   */
+  login(): void {
+    if (!liff.isLoggedIn()) {
+      liff.login();
+    }
+  }
 }
 
 // シングルトンインスタンスとしてエクスポート

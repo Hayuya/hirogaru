@@ -5,6 +5,7 @@ import { SortBar } from '../components/SortBar';
 import { CompanyCard } from '../components/CompanyCard';
 import type { Company, SortOption } from '../types/company';
 import { fetchCompanies } from '../api/companyApi';
+import { authManager } from '../auth/authManager';
 import type { AuthState } from '../types/auth';
 import './TopPage.css';
 import { LineUserDetailForm } from '../components/LineUserDetailForm';
@@ -162,6 +163,10 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   }, [allCompanies, filters, sort]);
 
   // === イベントハンドラ ===
+  const handleLogin = () => {
+    authManager.login();
+  };
+
   const handleSortChange = useCallback((key: SortOption, order: 'asc' | 'desc') => {
     setSort({ key, order });
 
@@ -239,44 +244,8 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   }, [authState.lineUserId]);
 
   // === レンダリング ===
-  const isUserRestricted = !authState.isLoggedIn || !authState.isFriend;
-
-  const renderContent = () => {
-    if (isLoading) {
-      return <div className="loading-container"><div className="loading-spinner"></div><p className="loading-text">データを読み込んでいます...</p></div>;
-    }
-    if (authState.error) return <div className="error-container"><p className="error-message">{authState.error}</p></div>;
-    if (apiError) return <div className="error-container"><p className="error-message">{apiError}</p></div>;
-    if (authState.isLoggedIn && !authState.isFriend) {
-      return (
-        <div className="registration-prompt">
-          <div className="prompt-content">
-            <h3>全コンテンツの閲覧には</h3>
-            <p>LINE公式アカウントの友だち追加が必要です。追加後、再度アクセスしてください。</p>
-            <a href="https://line.me/R/ti/p/YOUR_OFFICIAL_ACCOUNT_ID" className="register-button" style={{ textDecoration: 'none' }}>
-              LINEで友だち追加する
-            </a>
-          </div>
-        </div>
-      );
-    }
-    if (displayedCompanies.length === 0 && !isLoading) {
-      return <div className="no-results"><p>該当する企業が見つかりませんでした。</p></div>;
-    }
-    return (
-      <div className="companies-list">
-        {displayedCompanies.map((company, index) => (
-          <CompanyCard
-            key={company.id}
-            company={company}
-            displayRank={index + 1}
-            isRestricted={isUserRestricted && index >= 3}
-            onViewDetails={handleCompanyDetailView}
-          />
-        ))}
-      </div>
-    );
-  };
+  // ★変更点1: ログイン状態のみでコンテンツのロックを判定
+  const shouldLockContent = !authState.isLoggedIn;
 
   return (
     <div className="top-page">
@@ -313,7 +282,8 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
             </div>
           )}
 
-          {authState.isLoggedIn && authState.isFriend && (
+          {/* ★変更点2: ログイン時のみフィルターとソートバーを表示 */}
+          {authState.isLoggedIn && (
             <>
               <FilterBar
                 selectedIndustries={filters.selectedIndustries}
@@ -337,7 +307,60 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
               />
             </>
           )}
-          {renderContent()}
+
+          {/* ★変更点3: ログイン済みだが友達未追加の場合に案内を表示 */}
+          {authState.isLoggedIn && !authState.isFriend && (
+            <div className="registration-prompt">
+              <div className="prompt-content">
+                <h3>最新情報を受け取るには</h3>
+                <p>LINE公式アカウントの友だち追加がおすすめです。追加後、再度アクセスしてください。</p>
+                <a href="https://line.me/R/ti/p/YOUR_OFFICIAL_ACCOUNT_ID" className="register-button" style={{ textDecoration: 'none' }}>
+                  LINEで友だち追加する
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* コンテンツ表示エリア */}
+          {(!authState.isInitialized || isLoading) ? (
+            <div className="loading-container"><div className="loading-spinner"></div><p className="loading-text">データを読み込んでいます...</p></div>
+          ) : authState.error ? (
+            <div className="error-container"><p className="error-message">{authState.error}</p></div>
+          ) : apiError ? (
+            <div className="error-container"><p className="error-message">{apiError}</p></div>
+          ) : (
+            <>
+              {displayedCompanies.length === 0 ? (
+                <div className="no-results"><p>該当する企業が見つかりませんでした。</p></div>
+              ) : (
+                <div className="companies-list">
+                  {displayedCompanies.map((company, index) => (
+                    <CompanyCard
+                      key={company.id}
+                      company={company}
+                      displayRank={index + 1}
+                      // ★変更点4: 未ログインの場合、3件目以降にロックをかける
+                      isRestricted={shouldLockContent && index >= 3}
+                      onViewDetails={handleCompanyDetailView}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* ★変更点5: 未ログインの場合、リストの後にログイン案内を表示 */}
+              {!authState.isLoggedIn && (
+                <div className="login-prompt">
+                  <div className="prompt-content">
+                    <h3>4件目以降の企業を閲覧するには</h3>
+                    <p>LINEアカウントでのログインが必要です。PCからも簡単にログインできます。</p>
+                    <button onClick={handleLogin} className="login-button">
+                      LINEでログインして続きを読む
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </main>
     </div>
