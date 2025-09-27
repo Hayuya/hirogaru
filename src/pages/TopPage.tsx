@@ -244,8 +244,8 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   }, [authState.lineUserId]);
 
   // === レンダリング ===
-  // ★変更点1: ログイン状態のみでコンテンツのロックを判定
-  const shouldLockContent = !authState.isLoggedIn;
+  // ★変更点1: ログイン状態と友だち追加状態でコンテンツのロックを判定
+  const shouldLockContent = !authState.isLoggedIn || !authState.isFriend;
 
   return (
     <div className="top-page">
@@ -339,7 +339,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                       key={company.id}
                       company={company}
                       displayRank={index + 1}
-                      // ★変更点4: 未ログインの場合、3件目以降にロックをかける
+                      // ★変更点4: 条件未達の場合、3件目以降にロックをかける
                       isRestricted={shouldLockContent && index >= 3}
                       onViewDetails={handleCompanyDetailView}
                     />
@@ -347,15 +347,21 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                 </div>
               )}
 
-              {/* ★変更点5: 未ログインの場合、リストの後にログイン案内を表示 */}
-              {!authState.isLoggedIn && (
+              {/* ★変更点5: 条件未達の場合、リストの後に案内を表示 */}
+              {shouldLockContent && (
                 <div className="login-prompt">
                   <div className="prompt-content">
                     <h3>4件目以降の企業を閲覧するには</h3>
-                    <p>LINEアカウントでのログインが必要です。PCからも簡単にログインできます。</p>
-                    <button onClick={handleLogin} className="login-button">
-                      LINEでログインして続きを読む
-                    </button>
+                    {!authState.isLoggedIn ? (
+                      <>
+                        <p>LINEアカウントでのログインが必要です。PCからも簡単にログインできます。</p>
+                        <button onClick={handleLogin} className="login-button">
+                          LINEでログインして続きを読む
+                        </button>
+                      </>
+                    ) : (
+                      <p>LINE公式アカウントの友だち追加が必要です。追加後、再度アクセスしてください。</p>
+                    )}
                   </div>
                 </div>
               )}
