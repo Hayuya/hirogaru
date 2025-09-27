@@ -45,6 +45,15 @@ export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onNavigate }) => {
               個人情報の取り扱いに関するお問い合わせは、サイト内の個別相談窓口またはサポートよりお気軽にご連絡ください。
             </p>
           </section>
+
+          <div className="back-to-top-container">
+            <button 
+              onClick={() => onNavigate('/')} 
+              className="back-to-top-button"
+            >
+              トップへ戻る
+            </button>
+          </div>
         </div>
       </main>
       <Footer onNavigate={onNavigate} />

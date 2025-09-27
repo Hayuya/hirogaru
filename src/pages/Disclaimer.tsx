@@ -45,6 +45,15 @@ export const Disclaimer: React.FC<DisclaimerProps> = ({ onNavigate }) => {
               免責事項の内容は予告なく変更される場合があります。変更後の内容は本ページに掲載した時点で効力を生じるものとします。
             </p>
           </section>
+
+          <div className="back-to-top-container">
+            <button 
+              onClick={() => onNavigate('/')} 
+              className="back-to-top-button"
+            >
+              トップへ戻る
+            </button>
+          </div>
         </div>
       </main>
       <Footer onNavigate={onNavigate} />

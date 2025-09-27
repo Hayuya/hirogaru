@@ -21,6 +21,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           <p className="footer-description">広島で働きたい学生のための企業発見プラットフォーム。</p>
         </div>
         <nav className="footer-links">
+          <a href="/" onClick={(e) => handleClick(e, '/')}>
+            トップ
+          </a>
           <a href="/privacy-policy" onClick={(e) => handleClick(e, '/privacy-policy')}>
             プライバシーポリシー
           </a>

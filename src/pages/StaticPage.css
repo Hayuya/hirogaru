@@ -51,6 +51,30 @@
   line-height: 1.8;
 }
 
+.back-to-top-container {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border-color);
+}
+
+.back-to-top-button {
+  background: none;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 8px 24px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-to-top-button:hover {
+  background: var(--primary-light);
+}
+
+
 @media (max-width: 768px) {
   .static-main {
     padding: 32px 12px;
