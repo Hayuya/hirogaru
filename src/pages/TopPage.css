@@ -1,4 +1,7 @@
-/* ... existing styles at the end of the file ... */
+/* UPDATED: Add padding to create space below the hero section */
+.main-content {
+  padding-top: 40px;
+}
 
 .login-prompt {
   margin: 40px 0;

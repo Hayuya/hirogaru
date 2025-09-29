@@ -7,13 +7,13 @@
   margin-bottom: 20px;
   transition: all 0.3s ease;
   overflow: hidden;
-  border: 1px solid var(--border-color); /* 追加 */
+  border: 1px solid var(--border-color);
 }
 
 .company-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-  border-color: var(--secondary-light); /* 変更 */
+  border-color: var(--secondary-light);
 }
 
 .company-card.restricted {
@@ -34,7 +34,7 @@
   justify-content: center;
   width: 60px;
   height: 60px;
-  background: var(--primary-color); /* 変更: グラデーションから単色へ */
+  background: var(--primary-color);
   color: white;
   border-radius: 12px;
   margin-right: 20px;
@@ -73,8 +73,8 @@
 
 .industry-badge {
   padding: 4px 10px;
-  background: var(--primary-light); /* 変更 */
-  color: var(--primary-dark); /* 変更 */
+  background: var(--primary-light);
+  color: var(--primary-dark);
   border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
@@ -138,7 +138,7 @@
 .expand-button {
   width: 100%;
   padding: 10px;
-  background: var(--primary-light); /* 変更 */
+  background: var(--primary-light);
   color: var(--primary-color);
   border-radius: 8px;
   font-size: 14px;
@@ -151,7 +151,7 @@
 }
 
 .expand-button:hover {
-  background: var(--secondary-light); /* 変更 */
+  background: var(--secondary-light);
   color: var(--primary-dark);
 }
 
@@ -174,7 +174,7 @@
   }
   to {
     opacity: 1;
-    max-height: 1000px;
+    max-height: 1500px; /* Adjusted for more content */
   }
 }
 
@@ -200,26 +200,35 @@
 
 .detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
 .detail-item {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
+  padding-bottom: 8px;
   border-bottom: 1px dotted var(--border-color);
+}
+
+/* UPDATED: Add vertical line between columns on desktop */
+.detail-grid .detail-item:nth-child(odd) {
+  padding-right: 16px;
+  border-right: 1px solid var(--border-color);
 }
 
 .detail-label {
   font-size: 13px;
   color: var(--text-secondary);
+  white-space: nowrap;
+  margin-right: 16px;
 }
 
 .detail-value {
   font-size: 13px;
   color: var(--text-primary);
   font-weight: 500;
+  text-align: right;
 }
 
 .welfare-grid {
@@ -258,8 +267,8 @@
 
 .tag {
   padding: 4px 12px;
-  background: var(--secondary-light); /* 変更 */
-  color: var(--primary-dark); /* 変更 */
+  background: var(--secondary-light);
+  color: var(--primary-dark);
   border-radius: 16px;
   font-size: 12px;
   font-weight: 500;
@@ -304,6 +313,8 @@
   text-decoration: none;
 }
 
+/* --- Responsive & Restricted Styles --- */
+
 .restricted-overlay {
   position: absolute;
   top: 0;
@@ -334,7 +345,7 @@
   font-weight: 500;
 }
 
-/* レスポンシブ対応 */
+
 @media (max-width: 768px) {
   .card-header {
     padding: 16px;
@@ -360,6 +371,12 @@
   
   .detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* UPDATED: Remove vertical line on mobile */
+  .detail-grid .detail-item:nth-child(odd) {
+    padding-right: 0;
+    border-right: none;
   }
   
   .action-buttons {

@@ -32,8 +32,8 @@ export const Header: React.FC<HeaderProps> = ({ authState }) => {
         <div className="header-brand">
           <span className="brand-mark">🎓</span>
           <div className="brand-text">
-            <span className="brand-title">ジモトデ</span>
-            <span className="brand-subtitle">広島の就活パートナー</span>
+            <span className="brand-title">広島就活ナビ</span>
+            <span className="brand-subtitle">地方の就活パートナー</span>
           </div>
         </div>
       </div>

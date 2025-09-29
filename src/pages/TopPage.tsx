@@ -244,7 +244,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   }, [authState.lineUserId]);
 
   // === レンダリング ===
-  // ★変更点1: ログイン状態と友だち追加状態でコンテンツのロックを判定
+  // UPDATED: Content lock is now based on being logged in and a friend
   const shouldLockContent = !authState.isLoggedIn || !authState.isFriend;
 
   return (
@@ -281,8 +281,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
               <p>{detailSuccessMessage}</p>
             </div>
           )}
-
-          {/* ★変更点2: ログイン時のみフィルターとソートバーを表示 */}
+          
           {authState.isLoggedIn && (
             <>
               <FilterBar
@@ -308,7 +307,6 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
             </>
           )}
 
-          {/* ★変更点3: ログイン済みだが友達未追加の場合に案内を表示 */}
           {authState.isLoggedIn && !authState.isFriend && (
             <div className="registration-prompt">
               <div className="prompt-content">
@@ -321,7 +319,6 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
             </div>
           )}
 
-          {/* コンテンツ表示エリア */}
           {(!authState.isInitialized || isLoading) ? (
             <div className="loading-container"><div className="loading-spinner"></div><p className="loading-text">データを読み込んでいます...</p></div>
           ) : authState.error ? (
@@ -339,15 +336,15 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                       key={company.id}
                       company={company}
                       displayRank={index + 1}
-                      // ★変更点4: 条件未達の場合、3件目以降にロックをかける
-                      isRestricted={shouldLockContent && index >= 3}
+                      // UPDATED: Restriction logic removed, all cards are interactive.
+                      isRestricted={false}
                       onViewDetails={handleCompanyDetailView}
                     />
                   ))}
                 </div>
               )}
 
-              {/* ★変更点5: 条件未達の場合、リストの後に案内を表示 */}
+              
               {shouldLockContent && (
                 <div id="login-prompt" className="login-prompt">
                   <div className="prompt-content">

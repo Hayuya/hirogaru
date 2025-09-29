@@ -1,5 +1,3 @@
-/* hayuya/jdb/jdb-8592bceda6e76a80e30644a57bd00124caaafb91/frontend/src/components/HeroSection.css */
-
 .hero-section {
   /* 背景色は不要になり、画像とオーバーレイが背景となる */
   background: var(--background-color); /* フォールバック色として残しておく */

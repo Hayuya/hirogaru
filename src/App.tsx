@@ -46,9 +46,10 @@ function App() {
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
+  // UPDATED: Changed the document title
   useEffect(() => {
     if (route === '/') {
-      document.title = 'ジモトデ | 広島の優良企業と出会う就活サイト';
+      document.title = '広島就活ナビ | 広島の優良企業と出会う就活サイト';
     }
   }, [route]);
 

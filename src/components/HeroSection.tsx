@@ -1,17 +1,15 @@
 import React from 'react';
 import './HeroSection.css';
-// 広島の街並み画像ファイルをインポート（仮のパスとファイル名）
 import HiroshimaCityScape from '../assets/hiroshima-city-scape.webp'; 
 
 export const HeroSection: React.FC = () => {
   return (
     <section className="hero-section">
-      {/* 背景画像要素を追加 */}
       <div className="hero-background-image" style={{ backgroundImage: `url(${HiroshimaCityScape})` }}></div>
-      <div className="hero-overlay"></div> {/* 文字を見やすくするためのオーバーレイ */}
+      <div className="hero-overlay"></div>
       <div className="hero-container">
         <div className="hero-content">
-          <h2 className="hero-title">特設求人紹介サイト</h2>
+          <h2 className="hero-title">ひろがる企業研究リスト</h2>
           <p className="hero-subtitle">
             広島で働く、未来をつくる。厳選した優良企業を限定でご紹介します。
           </p>
