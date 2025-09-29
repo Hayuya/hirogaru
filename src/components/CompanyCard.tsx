@@ -11,7 +11,6 @@ interface CompanyCardProps {
 
 // --- HELPER FUNCTIONS ---
 
-// Format gender ratio string (e.g., "8.6:1.3") to a female ratio percentage
 const formatGenderRatio = (ratioStr: string): string => {
   if (!ratioStr || ratioStr === "非公開" || ratioStr === "N/A") {
     return '非公開';
@@ -31,7 +30,6 @@ const formatGenderRatio = (ratioStr: string): string => {
   return `女性 ${femalePercentage.toFixed(1)}%`;
 };
 
-// A simple component for displaying a detail item
 const DetailItem: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div className="detail-item">
     <span className="detail-label">{label}</span>
@@ -53,6 +51,11 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
     }
   };
   
+  // UPDATED: Safely handle rating value, even if it's null or undefined
+  const ratingDisplay = typeof company.rating === 'number' 
+    ? `${company.rating.toFixed(2)} / 5.0`
+    : '評価なし';
+
   return (
     <div className={`company-card ${isRestricted ? 'restricted' : ''}`}>
       <div className="card-header">
@@ -66,8 +69,8 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
             <span className="industry-badge">{company.industry}</span>
             <div className="rating">
               <span className="rating-stars">★</span>
-              <span className="rating-value">{company.rating.toFixed(2)} / 5.0</span>
-              <span className="review-count">({company.employee_reviews_count}件)</span>
+              <span className="rating-value">{ratingDisplay}</span>
+              <span className="review-count">({company.employee_reviews_count || 0}件)</span>
             </div>
           </div>
         </div>
@@ -129,7 +132,6 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
                   <div className="detail-grid">
                     <DetailItem label="本社所在地" value={company.headquarters_address} />
                     <DetailItem label="従業員数" value={company.number_of_employees ? `${company.number_of_employees}名` : 'N/A'} />
-                    {/* UPDATED: Display revenue as a plain string */}
                     <DetailItem label="売上高" value={company.revenue === "N/A" ? '非公開' : company.revenue} />
                     <DetailItem label="平均年齢" value={company.average_age ? `${company.average_age}歳` : 'N/A'} />
                     <DetailItem label="平均勤続年数" value={company.average_years_of_service ? `${company.average_years_of_service}年` : 'N/A'} />
