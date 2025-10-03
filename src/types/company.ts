@@ -13,9 +13,9 @@ export interface Company {
   relocation: string;
   bonus_frequency_timing: string;
   bonus_previous_year_result: string;
-  housing_allowance: boolean; 
+  housing_allowance: boolean;
   meal_subsidy: string;
-  special_leave: boolean; 
+  special_leave: boolean;
   qualification_support: boolean;
   company_overview_120: string;
   headquarters_address: string;

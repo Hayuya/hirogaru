@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Company } from '../types/company';
+import { TriangleChart, type ChartStats } from './TriangleChart';
 import './CompanyCard.css';
 
 interface CompanyCardProps {
@@ -7,6 +8,7 @@ interface CompanyCardProps {
   isRestricted: boolean;
   displayRank: number;
   onViewDetails?: (company: Company) => void;
+  chartStats: ChartStats;
 }
 
 // --- HELPER FUNCTIONS ---
@@ -64,7 +66,7 @@ const BooleanFeatureTag: React.FC<{ isAvailable: boolean; label: string }> = ({ 
 
 // --- MAIN COMPONENT ---
 
-export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted, displayRank, onViewDetails }) => {
+export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted, displayRank, onViewDetails, chartStats }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpanded = () => {
@@ -137,6 +139,12 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
 
             {isExpanded && (
               <div className="expanded-content">
+
+                <div className="detail-section">
+                  <h4 className="detail-title">企業バランスチャート</h4>
+                  <TriangleChart company={company} stats={chartStats} />
+                </div>
+
 
                 <div className="detail-section">
                   <h4 className="detail-title">企業概要</h4>

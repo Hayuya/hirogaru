@@ -11,6 +11,7 @@ import './TopPage.css';
 import { LineUserDetailForm } from '../components/LineUserDetailForm';
 import { createLineUserDetail, getLineUserDetail } from '../api/lineUserDetailApi';
 import { logLineAction } from '../api/lineActionApi';
+import { type ChartStats } from '../components/TriangleChart';
 
 const SORT_LABEL_MAP: Record<SortOption, string> = {
   starting_salary_graduates: '初任給',
@@ -43,6 +44,15 @@ const parseNumericValue = (value: string | number): number => {
   const match = String(value).match(/[\d,.]+/);
   return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
 };
+
+// 統計情報（平均・標準偏差）を計算するヘルパー関数
+const calculateStats = (data: number[]) => {
+  if (data.length === 0) return { mean: 0, stdDev: 1 };
+  const mean = data.reduce((a, b) => a + b, 0) / data.length;
+  const stdDev = Math.sqrt(data.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b, 0) / data.length);
+  return { mean, stdDev: stdDev === 0 ? 1 : stdDev }; // ゼロ除算を避ける
+};
+
 
 interface TopPageProps {
   authState: AuthState;
@@ -141,6 +151,28 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     };
     initApp();
   }, [loadLineUserDetail, authState]);
+
+  // チャート用の統計データを計算
+  const chartStats: ChartStats = useMemo(() => {
+    if (allCompanies.length === 0) {
+      return {
+        salary: { mean: 200000, stdDev: 1 },
+        employees: { mean: 1, stdDev: 1 },
+        holidays: { mean: 120, stdDev: 1 },
+      };
+    }
+
+    const salaries = allCompanies.map(c => parseNumericValue(c.base_salary)).filter(v => v > 0);
+    const logEmployees = allCompanies.map(c => c.number_of_employees).filter(v => v > 0).map(v => Math.log10(v));
+    const holidays = allCompanies.map(c => c.annual_holidays).filter(v => v > 0);
+
+    return {
+      salary: calculateStats(salaries),
+      employees: calculateStats(logEmployees),
+      holidays: calculateStats(holidays),
+    };
+  }, [allCompanies]);
+
 
   // === データ加工処理 (useMemo) ===
   const displayedCompanies = useMemo(() => {
@@ -322,7 +354,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
             <div className="registration-prompt">
               <div className="prompt-content">
                 <h3>すべての企業情報を見るには</h3>
-                <p>LINE公式アカウントを友だち追加し、そのLINEアカウントでログインしてください。すべての企業情報が閲覧可能になります。</p>
+                <p>LINE公式アカウントを友ち追加し、そのLINEアカウントでログインしてください。すべての企業情報が閲覧可能になります。</p>
                 <a href="https://lin.ee/eiuBq0X" className="register-button" style={{ textDecoration: 'none' }}>
                   LINEで友だち追加する
                 </a>
@@ -349,6 +381,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                       displayRank={index + 1}
                       isRestricted={false}
                       onViewDetails={handleCompanyDetailView}
+                      chartStats={chartStats}
                     />
                   ))}
                 </div>
