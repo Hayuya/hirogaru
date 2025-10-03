@@ -34,6 +34,12 @@ const sortOptions: {
     ascLabel: '初任給が低い順',
   },
   {
+    value: 'base_salary',
+    label: '基本給',
+    descLabel: '基本給が高い順',
+    ascLabel: '基本給が低い順',
+  },
+  {
     value: 'average_years_of_service',
     label: '平均勤続年数',
     descLabel: '勤続年数が長い順',

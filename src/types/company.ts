@@ -13,10 +13,10 @@ export interface Company {
   relocation: string;
   bonus_frequency_timing: string;
   bonus_previous_year_result: string;
-  housing_allowance: boolean; // booleanに変更
+  housing_allowance: boolean; 
   meal_subsidy: string;
-  special_leave: boolean; // booleanに変更
-  qualification_support: boolean; // booleanに変更
+  special_leave: boolean; 
+  qualification_support: boolean;
   company_overview_120: string;
   headquarters_address: string;
   number_of_employees: number;
@@ -51,7 +51,8 @@ export type SortOption =
   | 'number_of_employees'
   | 'average_overtime_hours'
   | 'average_years_of_service'
-  | 'average_age';
+  | 'average_age'
+  | 'base_salary'; // 追加
 
 // フィルター項目の定義
 export interface FilterOptions {

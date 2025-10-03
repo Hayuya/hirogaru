@@ -14,6 +14,7 @@ import { logLineAction } from '../api/lineActionApi';
 
 const SORT_LABEL_MAP: Record<SortOption, string> = {
   starting_salary_graduates: '初任給',
+  base_salary: '基本給',
   revenue: '売上高',
   number_of_employees: '従業員数',
   average_overtime_hours: '残業時間',
@@ -21,12 +22,20 @@ const SORT_LABEL_MAP: Record<SortOption, string> = {
   average_age: '平均年齢',
 };
 
-const OTHER_FILTER_LABEL_MAP: Record<'femaleRatio' | 'relocation' | 'specialLeave' | 'housingAllowance', string> = {
+const OTHER_FILTER_LABEL_MAP = {
   femaleRatio: '女性比率30%以上',
   relocation: '転勤なし',
   specialLeave: '特別休暇あり',
   housingAllowance: '住宅手当あり',
+  remoteWork: 'リモートワーク可',
+  flextime: 'フレックスタイム制',
+  qualificationSupport: '資格取得支援あり',
 };
+
+const isTruthy = (value: any): boolean => {
+    const strValue = String(value).toLowerCase();
+    return strValue === 'true' || strValue === '1' || strValue === 'あり';
+}
 
 // 文字列/数値から数値を確実に抽出するヘルパー関数
 const parseNumericValue = (value: string | number): number => {
@@ -54,10 +63,13 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   // フィルター・ソートのState
   const [filters, setFilters] = useState({
     selectedIndustries: [] as string[],
-    femaleRatioFilter: false,
-    relocationFilter: false,
-    specialLeaveFilter: false,
-    housingAllowanceFilter: false,
+    relocation: false,
+    housingAllowance: false,
+    remoteWork: false,
+    flextime: false,
+    specialLeave: false,
+    qualificationSupport: false,
+    femaleRatio: false,
   });
   const [sort, setSort] = useState<{ key: SortOption; order: 'asc' | 'desc' }>({
     key: 'starting_salary_graduates',
@@ -137,21 +149,22 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     let processed = [...allCompanies];
 
     // フィルター処理
-    const { selectedIndustries, femaleRatioFilter, relocationFilter, specialLeaveFilter, housingAllowanceFilter } = filters;
-    if (selectedIndustries.length > 0) {
-      processed = processed.filter(c => selectedIndustries.includes(c.industry));
+    if (filters.selectedIndustries.length > 0) {
+      processed = processed.filter(c => filters.selectedIndustries.includes(c.industry));
     }
-    if (femaleRatioFilter) {
+    if (filters.femaleRatio) {
       processed = processed.filter(c => {
         const match = c.gender_ratio.match(/女性:(\d+)%/);
         const ratio = match ? parseInt(match[1], 10) : 0;
         return ratio >= 30;
       });
     }
-    if (relocationFilter) processed = processed.filter(c => c.relocation === 'なし');
-    // 修正: 真偽値でフィルタリングするように変更
-    if (specialLeaveFilter) processed = processed.filter(c => c.special_leave);
-    if (housingAllowanceFilter) processed = processed.filter(c => c.housing_allowance);
+    if (filters.relocation) processed = processed.filter(c => c.relocation === 'なし');
+    if (filters.specialLeave) processed = processed.filter(c => isTruthy(c.special_leave));
+    if (filters.housingAllowance) processed = processed.filter(c => isTruthy(c.housing_allowance));
+    if (filters.remoteWork) processed = processed.filter(c => isTruthy(c.remote_work));
+    if (filters.flextime) processed = processed.filter(c => isTruthy(c.flextime));
+    if (filters.qualificationSupport) processed = processed.filter(c => isTruthy(c.qualification_support));
 
 
     // ソート処理
@@ -178,6 +191,11 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     const actionName = `button_click_sort-${label}`;
     void logLineAction({ lineUserId: authState.lineUserId, actionName });
   }, [authState.lineUserId]);
+  
+  const handleFilterChange = (key: keyof typeof filters, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
 
   const handleDetailSubmit = async ({
     university,
@@ -237,7 +255,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     void logLineAction({ lineUserId: authState.lineUserId, actionName });
   }, [authState.lineUserId]);
 
-  const handleOtherFilterClick = useCallback((filterKey: 'femaleRatio' | 'relocation' | 'specialLeave' | 'housingAllowance', _willSelect: boolean) => {
+  const handleOtherFilterClick = useCallback((filterKey: keyof typeof OTHER_FILTER_LABEL_MAP, _willSelect: boolean) => {
     if (!authState.lineUserId) return;
 
     const label = OTHER_FILTER_LABEL_MAP[filterKey];
@@ -287,17 +305,19 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
             <>
               <FilterBar
                 selectedIndustries={filters.selectedIndustries}
-                femaleRatioFilter={filters.femaleRatioFilter}
-                relocationFilter={filters.relocationFilter}
-                specialLeaveFilter={filters.specialLeaveFilter}
-                housingAllowanceFilter={filters.housingAllowanceFilter}
-                onIndustryChange={(v) => setFilters(f => ({ ...f, selectedIndustries: v }))}
-                onFemaleRatioChange={(v) => setFilters(f => ({ ...f, femaleRatioFilter: v }))}
-                onRelocationChange={(v) => setFilters(f => ({ ...f, relocationFilter: v }))}
-                onSpecialLeaveChange={(v) => setFilters(f => ({ ...f, specialLeaveFilter: v }))}
-                onHousingAllowanceChange={(v) => setFilters(f => ({ ...f, housingAllowanceFilter: v }))}
+                filters={{
+                    relocation: filters.relocation,
+                    housingAllowance: filters.housingAllowance,
+                    remoteWork: filters.remoteWork,
+                    flextime: filters.flextime,
+                    specialLeave: filters.specialLeave,
+                    qualificationSupport: filters.qualificationSupport,
+                    femaleRatio: filters.femaleRatio,
+                }}
+                onIndustryChange={(v) => handleFilterChange('selectedIndustries', v)}
+                onFilterChange={handleFilterChange as any}
                 onIndustryClick={handleIndustryFilterClick}
-                onOtherFilterClick={handleOtherFilterClick}
+                onOtherFilterClick={handleOtherFilterClick as any}
               />
               <SortBar
                 currentSort={sort.key}

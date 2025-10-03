@@ -2,35 +2,30 @@ import React from 'react';
 import { INDUSTRIES } from '../types/company';
 import './FilterBar.css';
 
+// 新しいフィルタの型定義
+type OtherFilterKey =
+  | 'relocation'
+  | 'housingAllowance'
+  | 'remoteWork'
+  | 'flextime'
+  | 'specialLeave'
+  | 'qualificationSupport'
+  | 'femaleRatio';
+
 interface FilterBarProps {
   selectedIndustries: string[];
-  femaleRatioFilter: boolean;
-  relocationFilter: boolean;
-  specialLeaveFilter: boolean;
-  housingAllowanceFilter: boolean;
+  filters: Record<OtherFilterKey, boolean>;
   onIndustryChange: (industries: string[]) => void;
-  onFemaleRatioChange: (checked: boolean) => void;
-  onRelocationChange: (checked: boolean) => void;
-  onSpecialLeaveChange: (checked: boolean) => void;
-  onHousingAllowanceChange: (checked: boolean) => void;
+  onFilterChange: (key: OtherFilterKey, checked: boolean) => void;
   onIndustryClick?: (industry: string, willSelect: boolean) => void;
-  onOtherFilterClick?: (
-    filterKey: 'femaleRatio' | 'relocation' | 'specialLeave' | 'housingAllowance',
-    willSelect: boolean
-  ) => void;
+  onOtherFilterClick?: (filterKey: OtherFilterKey, willSelect: boolean) => void;
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
   selectedIndustries,
-  femaleRatioFilter,
-  relocationFilter,
-  specialLeaveFilter,
-  housingAllowanceFilter,
+  filters,
   onIndustryChange,
-  onFemaleRatioChange,
-  onRelocationChange,
-  onSpecialLeaveChange,
-  onHousingAllowanceChange,
+  onFilterChange,
   onIndustryClick,
   onOtherFilterClick,
 }) => {
@@ -47,11 +42,12 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
   const handleClearAll = () => {
     onIndustryChange([]);
-    onFemaleRatioChange(false);
-    onRelocationChange(false);
-    onSpecialLeaveChange(false);
-    onHousingAllowanceChange(false);
+    (Object.keys(filters) as OtherFilterKey[]).forEach(key => {
+        onFilterChange(key, false);
+    });
   };
+  
+  const hasActiveFilter = selectedIndustries.length > 0 || (Object.values(filters) as boolean[]).some(v => v);
 
   return (
     <div className="filter-bar">
@@ -72,60 +68,40 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       </div>
       
       <div className="filter-section">
-        <h3 className="filter-title">その他の条件</h3>
+        <h3 className="filter-title">働き方・制度</h3>
         <div className="checkbox-filters">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={relocationFilter}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                onOtherFilterClick?.('relocation', checked);
-                onRelocationChange(checked);
-              }}
-            />
-            <span>転勤なし</span>
-          </label>
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={specialLeaveFilter}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                onOtherFilterClick?.('specialLeave', checked);
-                onSpecialLeaveChange(checked);
-              }}
-            />
-            <span>特別休暇あり</span>
-          </label>
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={housingAllowanceFilter}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                onOtherFilterClick?.('housingAllowance', checked);
-                onHousingAllowanceChange(checked);
-              }}
-            />
-            <span>住宅手当あり</span>
-          </label>
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={femaleRatioFilter}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                onOtherFilterClick?.('femaleRatio', checked);
-                onFemaleRatioChange(checked);
-              }}
-            />
-            <span>女性比率30%以上</span>
-          </label>
+            <label className="checkbox-label">
+                <input type="checkbox" checked={filters.relocation} onChange={e => onFilterChange('relocation', e.target.checked)} />
+                <span>転勤なし</span>
+            </label>
+            <label className="checkbox-label">
+                <input type="checkbox" checked={filters.housingAllowance} onChange={e => onFilterChange('housingAllowance', e.target.checked)} />
+                <span>住宅手当あり</span>
+            </label>
+            <label className="checkbox-label">
+                <input type="checkbox" checked={filters.remoteWork} onChange={e => onFilterChange('remoteWork', e.target.checked)} />
+                <span>リモートワーク可</span>
+            </label>
+            <label className="checkbox-label">
+                <input type="checkbox" checked={filters.flextime} onChange={e => onFilterChange('flextime', e.target.checked)} />
+                <span>フレックスタイム制</span>
+            </label>
+            <label className="checkbox-label">
+                <input type="checkbox" checked={filters.specialLeave} onChange={e => onFilterChange('specialLeave', e.target.checked)} />
+                <span>特別休暇あり</span>
+            </label>
+            <label className="checkbox-label">
+                <input type="checkbox" checked={filters.qualificationSupport} onChange={e => onFilterChange('qualificationSupport', e.target.checked)} />
+                <span>資格取得支援あり</span>
+            </label>
+            <label className="checkbox-label">
+                <input type="checkbox" checked={filters.femaleRatio} onChange={e => onFilterChange('femaleRatio', e.target.checked)} />
+                <span>女性比率30%以上</span>
+            </label>
         </div>
       </div>
       
-      {(selectedIndustries.length > 0 || femaleRatioFilter || relocationFilter || specialLeaveFilter || housingAllowanceFilter) && (
+      {hasActiveFilter && (
         <button className="clear-filters-btn" onClick={handleClearAll}>
           フィルターをクリア
         </button>
