@@ -9,8 +9,7 @@ type OtherFilterKey =
   | 'remoteWork'
   | 'flextime'
   | 'specialLeave'
-  | 'qualificationSupport'
-  | 'femaleRatio';
+  | 'qualificationSupport';
 
 interface FilterBarProps {
   selectedIndustries: string[];
@@ -93,10 +92,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <label className="checkbox-label">
                 <input type="checkbox" checked={filters.qualificationSupport} onChange={e => onFilterChange('qualificationSupport', e.target.checked)} />
                 <span>資格取得支援あり</span>
-            </label>
-            <label className="checkbox-label">
-                <input type="checkbox" checked={filters.femaleRatio} onChange={e => onFilterChange('femaleRatio', e.target.checked)} />
-                <span>女性比率30%以上</span>
             </label>
         </div>
       </div>

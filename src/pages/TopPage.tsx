@@ -23,7 +23,6 @@ const SORT_LABEL_MAP: Record<SortOption, string> = {
 };
 
 const OTHER_FILTER_LABEL_MAP = {
-  femaleRatio: '女性比率30%以上',
   relocation: '転勤なし',
   specialLeave: '特別休暇あり',
   housingAllowance: '住宅手当あり',
@@ -69,7 +68,6 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     flextime: false,
     specialLeave: false,
     qualificationSupport: false,
-    femaleRatio: false,
   });
   const [sort, setSort] = useState<{ key: SortOption; order: 'asc' | 'desc' }>({
     key: 'starting_salary_graduates',
@@ -151,13 +149,6 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     // フィルター処理
     if (filters.selectedIndustries.length > 0) {
       processed = processed.filter(c => filters.selectedIndustries.includes(c.industry));
-    }
-    if (filters.femaleRatio) {
-      processed = processed.filter(c => {
-        const match = c.gender_ratio.match(/女性:(\d+)%/);
-        const ratio = match ? parseInt(match[1], 10) : 0;
-        return ratio >= 30;
-      });
     }
     if (filters.relocation) processed = processed.filter(c => c.relocation === 'なし');
     if (filters.specialLeave) processed = processed.filter(c => isTruthy(c.special_leave));
@@ -312,7 +303,6 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                     flextime: filters.flextime,
                     specialLeave: filters.specialLeave,
                     qualificationSupport: filters.qualificationSupport,
-                    femaleRatio: filters.femaleRatio,
                 }}
                 onIndustryChange={(v) => handleFilterChange('selectedIndustries', v)}
                 onFilterChange={handleFilterChange as any}
