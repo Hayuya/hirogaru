@@ -80,6 +80,16 @@
   font-weight: 500;
 }
 
+.fixed-overtime-tag {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: var(--secondary-light);
+  color: var(--primary-dark);
+}
+
+
 .rating {
   display: flex;
   align-items: center;
@@ -231,48 +241,26 @@
   text-align: right;
 }
 
-.welfare-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.welfare-item {
+.boolean-features-grid {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.welfare-label {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.welfare-value {
-  font-size: 14px;
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.welfare-extra {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.welfare-tags {
-  display: flex;
-  gap: 8px;
   flex-wrap: wrap;
-  margin-top: 12px;
+  gap: 8px;
 }
 
-.tag {
-  padding: 4px 12px;
-  background: var(--secondary-light);
-  color: var(--primary-dark);
-  border-radius: 16px;
-  font-size: 12px;
+.boolean-feature-tag {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 500;
+  background-color: #f0f2f5;
+  color: var(--text-secondary);
 }
+
+.boolean-feature-tag.available {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+}
+
 
 .action-buttons {
   display: flex;
@@ -350,25 +338,25 @@
   .card-header {
     padding: 16px;
   }
-  
+
   .rank-badge {
     width: 50px;
     height: 50px;
     margin-right: 16px;
   }
-  
+
   .rank-number {
     font-size: 20px;
   }
-  
+
   .company-name {
     font-size: 16px;
   }
-  
+
   .key-info {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .detail-grid {
     grid-template-columns: 1fr;
   }
@@ -378,7 +366,7 @@
     padding-right: 0;
     border-right: none;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }

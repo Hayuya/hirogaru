@@ -11,21 +11,39 @@ interface CompanyCardProps {
 
 // --- HELPER FUNCTIONS ---
 
+const formatValue = (value: string | number | null | undefined): string => {
+  if (value === null || value === undefined || value === 'N/A' || value === '') {
+    return '非公開';
+  }
+  return String(value);
+};
+
+const formatPrefecture = (address: string): string => {
+    if (!address || address === 'N/A') return '非公開';
+    const match = address.match(/^(.+?[都道府県])/);
+    return match ? match[1] : address;
+}
+
+const isTruthy = (value: any): boolean => {
+    return String(value).toLowerCase() === 'true';
+}
+
+
 const formatGenderRatio = (ratioStr: string): string => {
   if (!ratioStr || ratioStr === "非公開" || ratioStr === "N/A") {
     return '非公開';
   }
-  
+
   const parts = ratioStr.match(/(\d+\.?\d*)\s*:\s*(\d+\.?\d*)/);
   if (!parts || parts.length < 3) return '非公開';
-  
+
   const male = parseFloat(parts[1]);
   const female = parseFloat(parts[2]);
-  
+
   if (isNaN(male) || isNaN(female) || (male + female === 0)) {
     return '非公開';
   }
-  
+
   const femalePercentage = (female / (male + female)) * 100;
   return `女性 ${femalePercentage.toFixed(1)}%`;
 };
@@ -33,9 +51,16 @@ const formatGenderRatio = (ratioStr: string): string => {
 const DetailItem: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div className="detail-item">
     <span className="detail-label">{label}</span>
-    <span className="detail-value">{value || 'N/A'}</span>
+    <span className="detail-value">{formatValue(value as string | number)}</span>
   </div>
 );
+
+const BooleanFeatureTag: React.FC<{ isAvailable: boolean; label: string }> = ({ isAvailable, label }) => (
+    <div className={`boolean-feature-tag ${isAvailable ? 'available' : ''}`}>
+      {label}
+    </div>
+  );
+
 
 // --- MAIN COMPONENT ---
 
@@ -50,9 +75,8 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
       setIsExpanded(!isExpanded);
     }
   };
-  
-  // UPDATED: Safely handle rating value, even if it's null or undefined
-  const ratingDisplay = typeof company.rating === 'number' 
+
+  const ratingDisplay = typeof company.rating === 'number'
     ? `${company.rating.toFixed(2)} / 5.0`
     : '評価なし';
 
@@ -67,6 +91,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
           <h3 className="company-name">{company.company_name}</h3>
           <div className="company-meta">
             <span className="industry-badge">{company.industry}</span>
+            {isTruthy(company.fixed_overtime_system) && <span className="fixed-overtime-tag">固定残業代あり</span>}
             <div className="rating">
               <span className="rating-stars">★</span>
               <span className="rating-value">{ratingDisplay}</span>
@@ -80,19 +105,15 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
         <div className="key-info">
           <div className="info-item">
             <span className="info-label">初任給</span>
-            <span className="info-value highlight">{company.starting_salary_graduates || 'N/A'}</span>
+            <span className="info-value highlight">{formatValue(company.starting_salary_graduates)}</span>
           </div>
           <div className="info-item">
-            <span className="info-label">年間休日</span>
-            <span className="info-value">{company.annual_holidays ? `${company.annual_holidays}日` : 'N/A'}</span>
+            <span className="info-label">従業員数</span>
+            <span className="info-value">{company.number_of_employees ? `${company.number_of_employees}名` : '非公開'}</span>
           </div>
           <div className="info-item">
-            <span className="info-label">勤務地</span>
-            <span className="info-value">{company.work_location || 'N/A'}</span>
-          </div>
-          <div className="info-item">
-            <span className="info-label">平均残業</span>
-            <span className="info-value">{company.average_overtime_hours ? `${company.average_overtime_hours}時間/月` : 'N/A'}</span>
+            <span className="info-label">本社所在地</span>
+            <span className="info-value">{formatPrefecture(company.headquarters_address)}</span>
           </div>
         </div>
 
@@ -116,55 +137,50 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
 
             {isExpanded && (
               <div className="expanded-content">
-                
+
                 <div className="detail-section">
                   <h4 className="detail-title">企業概要</h4>
-                  <p className="detail-text">{company.company_overview_120}</p>
+                  <p className="detail-text">{formatValue(company.company_overview_120)}</p>
                 </div>
-                
+
                 <div className="detail-section">
                   <h4 className="detail-title">募集要項抜粋</h4>
-                  <p className="detail-text">{company.job_openings_excerpt}</p>
+                  <p className="detail-text">{formatValue(company.job_openings_excerpt)}</p>
                 </div>
 
                 <div className="detail-section">
                   <h4 className="detail-title">企業データ</h4>
                   <div className="detail-grid">
                     <DetailItem label="本社所在地" value={company.headquarters_address} />
-                    <DetailItem label="従業員数" value={company.number_of_employees ? `${company.number_of_employees}名` : 'N/A'} />
-                    <DetailItem label="売上高" value={company.revenue === "N/A" ? '非公開' : company.revenue} />
+                    <DetailItem label="売上高" value={company.revenue} />
                     <DetailItem label="平均年齢" value={company.average_age ? `${company.average_age}歳` : 'N/A'} />
                     <DetailItem label="平均勤続年数" value={company.average_years_of_service ? `${company.average_years_of_service}年` : 'N/A'} />
                     <DetailItem label="男女比率" value={formatGenderRatio(company.gender_ratio)} />
+                    <DetailItem label="基本給" value={company.base_salary} />
+                    {isTruthy(company.fixed_overtime_system) && <DetailItem label="固定残業代" value={company.base_salary} />}
                   </div>
                 </div>
 
                 <div className="detail-section">
-                  <h4 className="detail-title">働き方・制度</h4>
-                   <div className="detail-grid">
-                    <DetailItem label="賞与" value={`${company.bonus_frequency_timing} (前年実績: ${company.bonus_previous_year_result || 'N/A'})`} />
-                    <DetailItem label="有給取得率" value={company.paid_leave_usage_rate ? `${company.paid_leave_usage_rate}%` : 'N/A'} />
-                    <DetailItem label="転勤" value={company.relocation} />
-                    <DetailItem label="住宅手当" value={company.housing_allowance} />
-                    <DetailItem label="食事補助" value={company.meal_subsidy} />
-                    <DetailItem label="特別休暇" value={company.special_leave} />
-                    <DetailItem label="資格取得支援" value={company.qualification_support} />
-                  </div>
+                    <h4 className="detail-title">働き方・制度</h4>
+                    <div className="boolean-features-grid">
+                        {isTruthy(company.housing_allowance) && <BooleanFeatureTag isAvailable={true} label="住宅手当" />}
+                        {isTruthy(company.remote_work) && <BooleanFeatureTag isAvailable={true} label="リモートワーク" />}
+                        {isTruthy(company.flextime) && <BooleanFeatureTag isAvailable={true} label="フレックスタイム" />}
+                        {isTruthy(company.special_leave) && <BooleanFeatureTag isAvailable={true} label="特別休暇" />}
+                        {isTruthy(company.qualification_support) && <BooleanFeatureTag isAvailable={true} label="資格取得支援" />}
+                    </div>
                 </div>
+
 
                 <div className="detail-section">
                   <h4 className="detail-title">事業内容</h4>
-                  <p className="detail-text">{company.main_business_products}</p>
+                  <p className="detail-text">{formatValue(company.main_business_products)}</p>
                 </div>
 
                 <div className="detail-section">
                   <h4 className="detail-title">企業の強み・特徴</h4>
-                  <p className="detail-text">{company.strengths_unique_points}</p>
-                </div>
-
-                <div className="detail-section">
-                  <h4 className="detail-title">今後の展望</h4>
-                  <p className="detail-text">{company.future_prospects}</p>
+                  <p className="detail-text">{formatValue(company.strengths_unique_points)}</p>
                 </div>
 
                 <div className="action-buttons">

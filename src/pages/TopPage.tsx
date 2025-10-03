@@ -149,8 +149,10 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
       });
     }
     if (relocationFilter) processed = processed.filter(c => c.relocation === 'なし');
-    if (specialLeaveFilter) processed = processed.filter(c => c.special_leave === 'あり');
-    if (housingAllowanceFilter) processed = processed.filter(c => c.housing_allowance === 'あり');
+    // 修正: 真偽値でフィルタリングするように変更
+    if (specialLeaveFilter) processed = processed.filter(c => c.special_leave);
+    if (housingAllowanceFilter) processed = processed.filter(c => c.housing_allowance);
+
 
     // ソート処理
     processed.sort((a, b) => {
@@ -244,7 +246,6 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   }, [authState.lineUserId]);
 
   // === レンダリング ===
-  // UPDATED: Content lock is now based on being logged in and a friend
   const shouldLockContent = !authState.isLoggedIn || !authState.isFriend;
 
   return (
@@ -336,7 +337,6 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                       key={company.id}
                       company={company}
                       displayRank={index + 1}
-                      // UPDATED: Restriction logic removed, all cards are interactive.
                       isRestricted={false}
                       onViewDetails={handleCompanyDetailView}
                     />

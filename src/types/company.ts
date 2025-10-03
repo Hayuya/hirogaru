@@ -13,10 +13,10 @@ export interface Company {
   relocation: string;
   bonus_frequency_timing: string;
   bonus_previous_year_result: string;
-  housing_allowance: string;
+  housing_allowance: boolean; // booleanに変更
   meal_subsidy: string;
-  special_leave: string;
-  qualification_support: string;
+  special_leave: boolean; // booleanに変更
+  qualification_support: boolean; // booleanに変更
   company_overview_120: string;
   headquarters_address: string;
   number_of_employees: number;
@@ -36,10 +36,16 @@ export interface Company {
   id: string;
   created_at: string;
   updated_at: string;
+  // 新しいプロパティ
+  fixed_overtime_system: boolean;
+  base_salary: string;
+  average_paid_leave_days: number | null;
+  remote_work: boolean;
+  flextime: boolean;
 }
 
 // ソート項目の定義
-export type SortOption = 
+export type SortOption =
   | 'starting_salary_graduates'
   | 'revenue'
   | 'number_of_employees'
