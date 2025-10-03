@@ -40,9 +40,10 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
     );
   }
   
-  const SIZE = 260;
+  const SIZE = 300;
   const center = SIZE / 2;
-  const radius = SIZE * 0.30;
+  const radius = SIZE * 0.32;
+  const labelRadius = radius * 1.35; // ラベル専用の配置半径（グリッドより外側）
 
   const getPoint = (angle: number, r: number) => ({
     x: center + r * Math.cos(angle - Math.PI / 2),
@@ -120,9 +121,9 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
         <circle cx={dataPoints.employees.x} cy={dataPoints.employees.y} r="5" className="chart-point point-employees" filter="url(#softGlow)" />
 
         {/* ラベル */}
-        <text x={center} y={getPoint(angles.salary, radius).y - 20} className="chart-label">給与</text>
-        <text x={getPoint(angles.holidays, radius).x - 28} y={getPoint(angles.holidays, radius).y + 6} className="chart-label label-left">休日</text>
-        <text x={getPoint(angles.employees, radius).x + 28} y={getPoint(angles.employees, radius).y + 6} className="chart-label label-right">規模</text>
+        <text x={center} y={getPoint(angles.salary, labelRadius).y} className="chart-label">給与</text>
+        <text x={getPoint(angles.holidays, labelRadius).x} y={getPoint(angles.holidays, labelRadius).y} className="chart-label label-left">休日</text>
+        <text x={getPoint(angles.employees, labelRadius).x} y={getPoint(angles.employees, labelRadius).y} className="chart-label label-right">規模</text>
       </svg>
     </div>
   );

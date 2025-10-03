@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 260px;
+  max-width: 300px;
   margin: 0 auto;
   padding: 16px 0;
 }
@@ -131,7 +131,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 160px;
+  min-height: 180px;
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
   border-radius: 12px;
   padding: 20px;
@@ -149,12 +149,12 @@
 /* レスポンシブ */
 @media (max-width: 768px) {
   .triangle-chart-wrapper {
-    max-width: 220px;
+    max-width: 260px;
     padding: 12px 0;
   }
 
   .chart-label {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .chart-point {
