@@ -34,12 +34,6 @@ const sortOptions: {
     ascLabel: '初任給が低い順',
   },
   {
-    value: 'base_salary',
-    label: '基本給',
-    descLabel: '基本給が高い順',
-    ascLabel: '基本給が低い順',
-  },
-  {
     value: 'average_years_of_service',
     label: '平均勤続年数',
     descLabel: '勤続年数が長い順',
@@ -65,15 +59,12 @@ export const SortBar: React.FC<SortBarProps> = ({
   totalCount,
   onSortChange,
 }) => {
-  const handleSortClick = (sort: SortOption) => {
-    if (currentSort === sort) {
-      // 同じソート項目をクリックした場合は順序を反転
-      onSortChange(sort, sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      // 新しいソート項目を選択した場合は降順から開始
-      onSortChange(sort, 'desc');
-    }
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const [key, order] = event.target.value.split('-') as [SortOption, 'asc' | 'desc'];
+    onSortChange(key, order);
   };
+
+  const currentValue = `${currentSort}-${sortOrder}`;
 
   return (
     <div className="sort-bar">
@@ -81,21 +72,15 @@ export const SortBar: React.FC<SortBarProps> = ({
         <span className="result-count">{totalCount}件の企業</span>
       </div>
       <div className="sort-options">
-        <span className="sort-label">並び替え:</span>
-        {sortOptions.map(option => (
-          <button
-            key={option.value}
-            className={`sort-button ${currentSort === option.value ? 'active' : ''}`}
-            onClick={() => handleSortClick(option.value)}
-            aria-pressed={currentSort === option.value}
-          >
-            {currentSort === option.value
-              ? sortOrder === 'desc'
-                ? option.descLabel
-                : option.ascLabel
-              : option.label}
-          </button>
-        ))}
+        <label htmlFor="sort-select" className="sort-label">並び替え:</label>
+        <select id="sort-select" value={currentValue} onChange={handleSortChange} className="sort-select">
+          {sortOptions.map(option => (
+            <React.Fragment key={option.value}>
+              <option value={`${option.value}-desc`}>{option.descLabel}</option>
+              <option value={`${option.value}-asc`}>{option.ascLabel}</option>
+            </React.Fragment>
+          ))}
+        </select>
       </div>
     </div>
   );

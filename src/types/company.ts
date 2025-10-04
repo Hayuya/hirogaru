@@ -52,8 +52,7 @@ export type SortOption =
   | 'number_of_employees'
   | 'average_overtime_hours'
   | 'average_years_of_service'
-  | 'average_age'
-  | 'base_salary'; // 追加
+  | 'average_age';
 
 // フィルター項目の定義
 export interface FilterOptions {
