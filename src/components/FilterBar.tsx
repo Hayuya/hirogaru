@@ -64,7 +64,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <button className="section-header" onClick={() => setIndustryOpen(!isIndustryOpen)}>
           <div className="section-header-title">
             <span className="filter-icon">📂</span>
-            <h3 className="filter-title">業界カテゴリー</h3>
+            <h3 className="filter-title">業界カテゴリーで絞る</h3>
             {activeIndustryCount > 0 && <span className="active-filter-badge">{activeIndustryCount}</span>}
           </div>
           <span className={`chevron ${isIndustryOpen ? 'open' : ''}`}>▼</span>
@@ -96,7 +96,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <button className="section-header" onClick={() => setWelfareOpen(!isWelfareOpen)}>
           <div className="section-header-title">
             <span className="filter-icon">💼</span>
-            <h3 className="filter-title">働き方・制度</h3>
+            <h3 className="filter-title">働き方・制度で絞る</h3>
             {activeWelfareCount > 0 && <span className="active-filter-badge">{activeWelfareCount}</span>}
           </div>
           <span className={`chevron ${isWelfareOpen ? 'open' : ''}`}>▼</span>
