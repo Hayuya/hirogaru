@@ -114,6 +114,10 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
             <span className="info-value">{company.number_of_employees ? `${company.number_of_employees}名` : '非公開'}</span>
           </div>
           <div className="info-item">
+            <span className="info-label">年間休日</span>
+            <span className="info-value">{company.annual_holidays ? `${company.annual_holidays}日` : '非公開'}</span>
+          </div>
+          <div className="info-item">
             <span className="info-label">本社所在地</span>
             <span className="info-value">{formatPrefecture(company.headquarters_address)}</span>
           </div>
@@ -159,6 +163,8 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
                 <div className="detail-section">
                   <h4 className="detail-title">企業データ</h4>
                   <div className="detail-grid">
+                    <DetailItem label="初任給" value={company.starting_salary_graduates} />
+                    <DetailItem label="従業員数" value={company.number_of_employees ? `${company.number_of_employees}名` : 'N/A'} />
                     <DetailItem label="本社所在地" value={company.headquarters_address} />
                     <DetailItem label="売上高" value={company.revenue} />
                     <DetailItem label="年間休日" value={company.annual_holidays ? `${company.annual_holidays}日` : 'N/A'} />
@@ -166,7 +172,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
                     <DetailItem label="平均勤続年数" value={company.average_years_of_service ? `${company.average_years_of_service}年` : 'N/A'} />
                     <DetailItem label="男女比率" value={formatGenderRatio(company.gender_ratio)} />
                     <DetailItem label="基本給" value={company.base_salary} />
-                    {isTruthy(company.fixed_overtime_system) && <DetailItem label="固定残業代" value={company.base_salary} />}
+                    {isTruthy(company.fixed_overtime_system) && <DetailItem label="固定残業代" value={company.fixed_overtime_allowance} />}
                   </div>
                 </div>
 

@@ -38,6 +38,7 @@ export interface Company {
   updated_at: string;
   // 新しいプロパティ
   fixed_overtime_system: boolean;
+  fixed_overtime_allowance: string; //
   base_salary: string;
   average_paid_leave_days: number | null;
   remote_work: boolean;
