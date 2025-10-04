@@ -17,8 +17,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <span className="footer-logo">ジモトデ</span>
-          <p className="footer-description">広島で働きたい学生のための企業発見プラットフォーム。</p>
+          <span className="footer-logo">広島就活ナビ</span>
+          <p className="footer-description">広島県内の優良企業との出会いを創出する、学生向け就活支援プラットフォームです。</p>
         </div>
         <nav className="footer-links">
           <a href="/" onClick={(e) => handleClick(e, '/')}>
@@ -31,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             免責事項
           </a>
         </nav>
-        <div className="footer-copy">© {new Date().getFullYear()} ジモトデ. All rights reserved.</div>
+        <div className="footer-copy">© {new Date().getFullYear()} 広島就活ナビ. All rights reserved.</div>
       </div>
     </footer>
   );

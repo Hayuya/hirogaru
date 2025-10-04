@@ -55,14 +55,18 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     });
   };
 
-  const hasActiveIndustryFilter = selectedIndustries.length > 0;
-  const hasActiveWelfareFilter = (Object.values(filters) as boolean[]).some(v => v);
+  const activeIndustryCount = selectedIndustries.length;
+  const activeWelfareCount = Object.values(filters).filter(v => v).length;
 
   return (
     <div className="filter-bar">
       <div className="collapsible-section">
         <button className="section-header" onClick={() => setIndustryOpen(!isIndustryOpen)}>
-          <h3 className="filter-title">業界カテゴリー</h3>
+          <div className="section-header-title">
+            <span className="filter-icon">📂</span>
+            <h3 className="filter-title">業界カテゴリー</h3>
+            {activeIndustryCount > 0 && <span className="active-filter-badge">{activeIndustryCount}</span>}
+          </div>
           <span className={`chevron ${isIndustryOpen ? 'open' : ''}`}>▼</span>
         </button>
         {isIndustryOpen && (
@@ -79,7 +83,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 </button>
               ))}
             </div>
-            {hasActiveIndustryFilter && (
+            {activeIndustryCount > 0 && (
               <button className="clear-filters-btn" onClick={clearIndustries}>
                 クリア
               </button>
@@ -90,7 +94,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
       <div className="collapsible-section">
         <button className="section-header" onClick={() => setWelfareOpen(!isWelfareOpen)}>
-          <h3 className="filter-title">働き方・制度</h3>
+          <div className="section-header-title">
+            <span className="filter-icon">💼</span>
+            <h3 className="filter-title">働き方・制度</h3>
+            {activeWelfareCount > 0 && <span className="active-filter-badge">{activeWelfareCount}</span>}
+          </div>
           <span className={`chevron ${isWelfareOpen ? 'open' : ''}`}>▼</span>
         </button>
         {isWelfareOpen && (
@@ -121,7 +129,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                     <span>固定残業代なし</span>
                 </label>
             </div>
-            {hasActiveWelfareFilter && (
+            {activeWelfareCount > 0 && (
               <button className="clear-filters-btn" onClick={clearWelfareFilters}>
                 クリア
               </button>
