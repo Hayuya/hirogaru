@@ -379,7 +379,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                       key={company.id}
                       company={company}
                       displayRank={index + 1}
-                      isRestricted={false}
+                      isRestricted={shouldLockContent}
                       onViewDetails={handleCompanyDetailView}
                       chartStats={chartStats}
                     />

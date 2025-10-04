@@ -15,6 +15,16 @@
   align-items: center;
 }
 
+/* ADDED: Styles for the demo (blurred) version of the chart */
+.triangle-chart-container.demo {
+  filter: blur(4px);
+  -webkit-filter: blur(4px);
+  opacity: 0.8;
+  pointer-events: none; /* Disables mouse interaction on the blurred chart */
+  transition: all 0.3s ease;
+}
+
+
 .triangle-chart-svg {
   width: 100%;
   height: auto;

@@ -50,9 +50,10 @@ export interface ChartStats {
 interface TriangleChartProps {
   company: Company;
   stats: ChartStats;
+  isDemo?: boolean;
 }
 
-export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) => {
+export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats, isDemo = false }) => {
   const salaryValue = parseNumericValue(company.base_salary);
   const employeesValue = company.number_of_employees;
   const holidaysValue = company.annual_holidays;
@@ -94,11 +95,20 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
   };
 
   // 5段階評価に変換（非公開の場合は3固定）
-  const ratings = {
+  let ratings = {
     salary: isPrivateSalary ? 3 : scoreToRating(scores.salary),
     employees: isPrivateEmployees ? 3 : scoreToRating(scores.employees),
     holidays: isPrivateHolidays ? 3 : scoreToRating(scores.holidays),
   };
+
+  // isDemoがtrueの場合、評価を固定値で上書き
+  if (isDemo) {
+    ratings = {
+      salary: 4,
+      holidays: 4,
+      employees: 3,
+    };
+  }
   
   const dataPoints = {
     salary: getPoint(angles.salary, radius * (ratings.salary / 5)),
@@ -113,9 +123,12 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
 
   // 注意書きメッセージの生成
   const noteMessages: string[] = [];
-  if (isPrivateSalary) noteMessages.push('給与は非公開のため3とする');
-  if (isPrivateHolidays) noteMessages.push('休日は非公開のため3とする');
-  if (isPrivateEmployees) noteMessages.push('規模は非公開のため3とする');
+  if (!isDemo) {
+    if (isPrivateSalary) noteMessages.push('給与は非公開のため3とする');
+    if (isPrivateHolidays) noteMessages.push('休日は非公開のため3とする');
+    if (isPrivateEmployees) noteMessages.push('規模は非公開のため3とする');
+  }
+
 
   // 魅力点の計算（3つの評価の平均）
   const attractionScore = ((ratings.salary + ratings.holidays + ratings.employees) / 3).toFixed(1);
@@ -148,7 +161,7 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
   };
 
   return (
-    <div className="triangle-chart-container">
+    <div className={`triangle-chart-container ${isDemo ? 'demo' : ''}`}>
       <div className="triangle-chart-wrapper">
         <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="triangle-chart-svg">
           <defs>

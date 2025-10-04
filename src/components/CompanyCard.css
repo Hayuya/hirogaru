@@ -301,38 +301,25 @@
   text-decoration: none;
 }
 
-/* --- Responsive & Restricted Styles --- */
-
-.restricted-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(4px);
-}
-
-.restricted-message {
+/* --- ADDED: Style for the chart login prompt --- */
+.chart-login-prompt {
   text-align: center;
-  padding: 20px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: -10px; /* Negative margin to pull it closer to the chart */
+  position: relative;
+  z-index: 2; /* Make sure it's above the blurred chart */
 }
 
-.lock-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-  display: block;
-}
-
-.restricted-message p {
-  font-size: 14px;
-  color: var(--text-secondary);
+.chart-login-prompt p {
+  font-size: 13px;
   font-weight: 500;
+  color: var(--text-secondary);
 }
 
+
+/* --- Responsive Styles --- */
 
 @media (max-width: 768px) {
   .card-header {
