@@ -69,7 +69,8 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   const [isSubmittingDetail, setIsSubmittingDetail] = useState(false);
   const originalOverflowRef = useRef<string | null>(null);
 
-  // フィルター・ソートのState
+  // フィルター・ソート・検索のState
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     selectedIndustries: [] as string[],
     relocation: false,
@@ -175,7 +176,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
 
 
   // === データ加工処理 (useMemo) ===
-  const displayedCompanies = useMemo(() => {
+  const filteredCompanies = useMemo(() => {
     let processed = [...allCompanies];
 
     // フィルター処理
@@ -189,16 +190,28 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     if (filters.flextime) processed = processed.filter(c => isTruthy(c.flextime));
     if (filters.fixedOvertimeSystem) processed = processed.filter(c => !isTruthy(c.fixed_overtime_system));
 
-
+    return processed;
+  }, [allCompanies, filters]);
+  
+  const displayedCompanies = useMemo(() => {
+    let processed = [...filteredCompanies];
+  
+    // 検索処理
+    if (searchQuery) {
+      processed = processed.filter(c =>
+        c.company_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+  
     // ソート処理
     processed.sort((a, b) => {
       const valA = parseNumericValue(a[sort.key]);
       const valB = parseNumericValue(b[sort.key]);
       return sort.order === 'asc' ? valA - valB : valB - valA;
     });
-
+  
     return processed;
-  }, [allCompanies, filters, sort]);
+  }, [filteredCompanies, searchQuery, sort]);
 
   // === イベントハンドラ ===
   const handleLogin = () => {
@@ -340,6 +353,9 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                 onFilterChange={handleFilterChange as any}
                 onIndustryClick={handleIndustryFilterClick}
                 onOtherFilterClick={handleOtherFilterClick as any}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                searchableCompanyCount={filteredCompanies.length}
               />
               <SortBar
                 currentSort={sort.key}

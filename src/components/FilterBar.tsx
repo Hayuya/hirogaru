@@ -18,6 +18,9 @@ interface FilterBarProps {
   onFilterChange: (key: OtherFilterKey, checked: boolean) => void;
   onIndustryClick?: (industry: string, willSelect: boolean) => void;
   onOtherFilterClick?: (filterKey: OtherFilterKey, willSelect: boolean) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  searchableCompanyCount: number;
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
@@ -27,6 +30,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onFilterChange,
   onIndustryClick,
   onOtherFilterClick,
+  searchQuery,
+  onSearchChange,
+  searchableCompanyCount,
 }) => {
   const handleIndustryClick = (industry: string) => {
     const isSelected = selectedIndustries.includes(industry);
@@ -101,6 +107,19 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           フィルターをクリア
         </button>
       )}
+
+      <div className="filter-section">
+        <h3 className="filter-title">企業名で検索</h3>
+        <div className="search-form">
+          <input
+            type="text"
+            placeholder={`${searchableCompanyCount}件の中から検索`}
+            value={searchQuery}
+            onChange={e => onSearchChange(e.target.value)}
+            className="search-input"
+          />
+        </div>
+      </div>
     </div>
   );
 };
