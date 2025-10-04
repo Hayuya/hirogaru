@@ -21,6 +21,26 @@ const scoreToRating = (score: number): number => {
   return Math.min(5, Math.max(1, Math.round(score / 20)));
 };
 
+// Get color based on rating (1-5) - 元のグラデーションに戻す
+const getRatingColor = (rating: number): string => {
+  switch (rating) {
+    case 5: return '#EF4444'; // 赤
+    case 4: return '#F97316'; // 橙
+    case 3: return '#EAB308'; // 黄
+    case 2: return '#22C55E'; // 緑
+    case 1: return '#3B82F6'; // 青
+    default: return '#94A3B8'; // グレー（フォールバック）
+  }
+};
+
+const gradientBlue = '#87CEEB'; // エリアのグラデーション用の薄い青色
+
+// Get average rating color for attraction score
+const getAverageRatingColor = (avgRating: number): string => {
+  const rounded = Math.round(avgRating);
+  return getRatingColor(rounded);
+};
+
 export interface ChartStats {
   salary: { mean: number; stdDev: number };
   employees: { mean: number; stdDev: number };
@@ -52,8 +72,8 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
   
   const SIZE = 400;
   const center = SIZE / 2;
-  const radius = SIZE * 0.35;
-  const labelRadius = radius * 1.2;
+  const radius = SIZE * 0.32;
+  const labelRadius = radius * 1.45;
 
   const getPoint = (angle: number, r: number) => ({
     x: center + r * Math.cos(angle - Math.PI / 2),
@@ -100,6 +120,14 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
   // 魅力点の計算（3つの評価の平均）
   const attractionScore = ((ratings.salary + ratings.holidays + ratings.employees) / 3).toFixed(1);
   const attractionScoreInt = Math.round(parseFloat(attractionScore));
+  const attractionScoreColor = getAverageRatingColor(parseFloat(attractionScore));
+
+  // 各ポイントの色
+  const pointColors = {
+    salary: getRatingColor(ratings.salary),
+    holidays: getRatingColor(ratings.holidays),
+    employees: getRatingColor(ratings.employees)
+  };
 
   // スター表示用の配列作成
   const renderStars = () => {
@@ -109,7 +137,9 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
         <svg key={i} className="star" viewBox="0 0 24 24">
           <polygon
             points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-            className={i <= attractionScoreInt ? 'star-filled' : 'star-empty'}
+            style={{ 
+              fill: i <= attractionScoreInt ? attractionScoreColor : '#e5e7eb'
+            }}
           />
         </svg>
       );
@@ -122,10 +152,21 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
       <div className="triangle-chart-wrapper">
         <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="triangle-chart-svg">
           <defs>
-            <linearGradient id="chartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#EC4899" stopOpacity="0.15" />
-            </linearGradient>
+            {/* 各頂点からのグラデーション */}
+            <radialGradient id="salaryGradient" cx={`${dataPoints.salary.x / SIZE * 100}%`} cy={`${dataPoints.salary.y / SIZE * 100}%`} r="50%">
+              <stop offset="0%" stopColor={gradientBlue} stopOpacity="0.4" />
+              <stop offset="100%" stopColor={gradientBlue} stopOpacity="0.05" />
+            </radialGradient>
+            
+            <radialGradient id="holidaysGradient" cx={`${dataPoints.holidays.x / SIZE * 100}%`} cy={`${dataPoints.holidays.y / SIZE * 100}%`} r="50%">
+              <stop offset="0%" stopColor={gradientBlue} stopOpacity="0.4" />
+              <stop offset="100%" stopColor={gradientBlue} stopOpacity="0.05" />
+            </radialGradient>
+            
+            <radialGradient id="employeesGradient" cx={`${dataPoints.employees.x / SIZE * 100}%`} cy={`${dataPoints.employees.y / SIZE * 100}%`} r="50%">
+              <stop offset="0%" stopColor={gradientBlue} stopOpacity="0.4" />
+              <stop offset="100%" stopColor={gradientBlue} stopOpacity="0.05" />
+            </radialGradient>
 
             <filter id="softGlow">
               <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -242,24 +283,61 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
             ))}
           </g>
 
-          {/* データエリア */}
-          <polygon 
-            points={polygonPoints} 
-            className="chart-area"
-            fill="url(#chartGradient)"
-          />
+          {/* データエリア - 3つのグラデーションを重ねる */}
+          <g className="chart-area-group">
+            <polygon 
+              points={polygonPoints} 
+              className="chart-area"
+              fill="url(#salaryGradient)"
+              style={{ opacity: 0.8 }}
+            />
+            <polygon 
+              points={polygonPoints} 
+              className="chart-area"
+              fill="url(#holidaysGradient)"
+              style={{ opacity: 0.6, mixBlendMode: 'multiply' }}
+            />
+            <polygon 
+              points={polygonPoints} 
+              className="chart-area"
+              fill="url(#employeesGradient)"
+              style={{ opacity: 0.6, mixBlendMode: 'multiply' }}
+            />
+          </g>
 
           {/* データの輪郭 */}
           <polygon 
             points={polygonPoints} 
             className="chart-border"
+            stroke="#4682B4"
             fill="none"
           />
 
           {/* データポイント */}
-          <circle cx={dataPoints.salary.x} cy={dataPoints.salary.y} r="6" className="chart-point point-salary" filter="url(#softGlow)" />
-          <circle cx={dataPoints.holidays.x} cy={dataPoints.holidays.y} r="6" className="chart-point point-holidays" filter="url(#softGlow)" />
-          <circle cx={dataPoints.employees.x} cy={dataPoints.employees.y} r="6" className="chart-point point-employees" filter="url(#softGlow)" />
+          <circle 
+            cx={dataPoints.salary.x} 
+            cy={dataPoints.salary.y} 
+            r="6" 
+            className="chart-point" 
+            fill={pointColors.salary}
+            filter="url(#softGlow)" 
+          />
+          <circle 
+            cx={dataPoints.holidays.x} 
+            cy={dataPoints.holidays.y} 
+            r="6" 
+            className="chart-point" 
+            fill={pointColors.holidays}
+            filter="url(#softGlow)" 
+          />
+          <circle 
+            cx={dataPoints.employees.x} 
+            cy={dataPoints.employees.y} 
+            r="6" 
+            className="chart-point" 
+            fill={pointColors.employees}
+            filter="url(#softGlow)" 
+          />
 
           {/* ラベル */}
           <text x={center} y={getPoint(angles.salary, labelRadius).y - 5} className="chart-label">給与</text>
@@ -280,10 +358,25 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats }) 
       </div>
 
       {/* 魅力点表示 */}
-      <div className="attraction-score">
-        <div className="attraction-score-label">魅力点</div>
-        <div>
-          <span className="attraction-score-value">{attractionScore}</span>
+      <div 
+        className="attraction-score"
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = attractionScoreColor + '40';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = '#e5e7eb';
+        }}
+      >
+        <div className="attraction-score-label">総合魅力度</div>
+        <div className="attraction-score-content">
+          <span 
+            className="attraction-score-value"
+            style={{ 
+              color: attractionScoreColor
+            }}
+          >
+            {attractionScore}
+          </span>
           <span className="attraction-score-suffix">/ 5.0</span>
         </div>
         <div className="attraction-score-stars">
