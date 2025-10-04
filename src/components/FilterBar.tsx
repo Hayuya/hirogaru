@@ -63,7 +63,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       <div className="collapsible-section">
         <button className="section-header" onClick={() => setIndustryOpen(!isIndustryOpen)}>
           <div className="section-header-title">
-            <h3 className="filter-title">業界カテゴリーで絞る</h3>
+            <h3 className="filter-title">○業界カテゴリーで絞る</h3>
             {activeIndustryCount > 0 && <span className="active-filter-badge">{activeIndustryCount}</span>}
           </div>
           <span className={`chevron ${isIndustryOpen ? 'open' : ''}`}>▼</span>
