@@ -9,7 +9,7 @@ type OtherFilterKey =
   | 'remoteWork'
   | 'flextime'
   | 'specialLeave'
-  | 'fixedOvertimeSystem'; // fixedOvertimeSystem を追加
+  | 'fixedOvertimeSystem'; // fixedOvertimeSystem を使用
 
 interface FilterBarProps {
   selectedIndustries: string[];
@@ -91,7 +91,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             </label>
             <label className="checkbox-label">
                 <input type="checkbox" checked={filters.fixedOvertimeSystem} onChange={e => onFilterChange('fixedOvertimeSystem', e.target.checked)} />
-                <span>固定残業代あり</span>
+                <span>固定残業代なし</span>
             </label>
         </div>
       </div>

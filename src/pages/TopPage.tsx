@@ -29,7 +29,7 @@ const OTHER_FILTER_LABEL_MAP = {
   housingAllowance: '住宅手当あり',
   remoteWork: 'リモートワーク可',
   flextime: 'フレックスタイム制',
-  fixedOvertimeSystem: '固定残業代あり',
+  fixedOvertimeSystem: '固定残業代なし',
 };
 
 const isTruthy = (value: any): boolean => {
@@ -187,7 +187,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     if (filters.housingAllowance) processed = processed.filter(c => isTruthy(c.housing_allowance));
     if (filters.remoteWork) processed = processed.filter(c => isTruthy(c.remote_work));
     if (filters.flextime) processed = processed.filter(c => isTruthy(c.flextime));
-    if (filters.fixedOvertimeSystem) processed = processed.filter(c => isTruthy(c.fixed_overtime_system));
+    if (filters.fixedOvertimeSystem) processed = processed.filter(c => !isTruthy(c.fixed_overtime_system));
 
 
     // ソート処理
