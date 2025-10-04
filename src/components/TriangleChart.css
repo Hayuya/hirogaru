@@ -74,8 +74,8 @@
 .chart-area-group {
   opacity: 0;
   transform-origin: center;
-  /* UPDATED: Changed animation delay to 0.8s */
-  animation: scaleUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.65s forwards;
+  /* UPDATED: Changed animation delay to 0.6s */
+  animation: scaleUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;
 }
 
 @keyframes scaleUp {
