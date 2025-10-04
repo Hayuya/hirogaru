@@ -2,14 +2,14 @@ import React from 'react';
 import { INDUSTRIES } from '../types/company';
 import './FilterBar.css';
 
-// 新しいフィルタの型定義
+// フィルタの型定義を更新
 type OtherFilterKey =
   | 'relocation'
   | 'housingAllowance'
   | 'remoteWork'
   | 'flextime'
   | 'specialLeave'
-  | 'qualificationSupport';
+  | 'fixedOvertimeSystem'; // fixedOvertimeSystem を追加
 
 interface FilterBarProps {
   selectedIndustries: string[];
@@ -90,8 +90,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 <span>特別休暇あり</span>
             </label>
             <label className="checkbox-label">
-                <input type="checkbox" checked={filters.qualificationSupport} onChange={e => onFilterChange('qualificationSupport', e.target.checked)} />
-                <span>資格取得支援あり</span>
+                <input type="checkbox" checked={filters.fixedOvertimeSystem} onChange={e => onFilterChange('fixedOvertimeSystem', e.target.checked)} />
+                <span>固定残業代あり</span>
             </label>
         </div>
       </div>

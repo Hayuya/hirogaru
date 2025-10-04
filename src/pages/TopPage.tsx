@@ -29,7 +29,7 @@ const OTHER_FILTER_LABEL_MAP = {
   housingAllowance: '住宅手当あり',
   remoteWork: 'リモートワーク可',
   flextime: 'フレックスタイム制',
-  qualificationSupport: '資格取得支援あり',
+  fixedOvertimeSystem: '固定残業代あり',
 };
 
 const isTruthy = (value: any): boolean => {
@@ -77,7 +77,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     remoteWork: false,
     flextime: false,
     specialLeave: false,
-    qualificationSupport: false,
+    fixedOvertimeSystem: false,
   });
   const [sort, setSort] = useState<{ key: SortOption; order: 'asc' | 'desc' }>({
     key: 'starting_salary_graduates',
@@ -187,7 +187,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     if (filters.housingAllowance) processed = processed.filter(c => isTruthy(c.housing_allowance));
     if (filters.remoteWork) processed = processed.filter(c => isTruthy(c.remote_work));
     if (filters.flextime) processed = processed.filter(c => isTruthy(c.flextime));
-    if (filters.qualificationSupport) processed = processed.filter(c => isTruthy(c.qualification_support));
+    if (filters.fixedOvertimeSystem) processed = processed.filter(c => isTruthy(c.fixed_overtime_system));
 
 
     // ソート処理
@@ -334,7 +334,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                     remoteWork: filters.remoteWork,
                     flextime: filters.flextime,
                     specialLeave: filters.specialLeave,
-                    qualificationSupport: filters.qualificationSupport,
+                    fixedOvertimeSystem: filters.fixedOvertimeSystem,
                 }}
                 onIndustryChange={(v) => handleFilterChange('selectedIndustries', v)}
                 onFilterChange={handleFilterChange as any}
