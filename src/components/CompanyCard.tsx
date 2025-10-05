@@ -193,10 +193,12 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
             <div className="detail-section">
               <h4 className="detail-title">企業データ</h4>
               <div className="detail-grid">
-                {company.starting_salary_graduates && company.starting_salary_graduates !== 'N/A' && <DetailItem label="初任給" value={company.starting_salary_graduates} />}
-                {company.number_of_employees ? <DetailItem label="従業員数" value={`${company.number_of_employees}名`} /> : null}
                 {company.headquarters_address && company.headquarters_address !== 'N/A' && <DetailItem label="本社所在地" value={company.headquarters_address} />}
+                {company.number_of_employees ? <DetailItem label="従業員数" value={`${company.number_of_employees}名`} /> : null}
                 {company.revenue && company.revenue !== 'N/A' && <DetailItem label="売上高" value={company.revenue} />}
+                {company.starting_salary_graduates && company.starting_salary_graduates !== 'N/A' && <DetailItem label="初任給" value={company.starting_salary_graduates} />}
+                {company.base_salary && company.base_salary !== 'N/A' && <DetailItem label="基本給" value={company.base_salary} />}
+                {isTruthy(company.fixed_overtime_system) && company.fixed_overtime_allowance && company.fixed_overtime_allowance !== 'N/A' && <DetailItem label="固定残業代" value={company.fixed_overtime_allowance} />}
                 {company.annual_holidays ? <DetailItem label="年間休日" value={`${company.annual_holidays}日`} /> : null}
                 {company.average_age ? <DetailItem label="平均年齢" value={`${company.average_age}歳`} /> : null}
                 {company.average_years_of_service ? <DetailItem label="平均勤続年数" value={`${company.average_years_of_service}年`} /> : null}
@@ -204,8 +206,6 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
                   const ratio = formatGenderRatio(company.gender_ratio);
                   return ratio !== '非公開' ? <DetailItem label="男女比率" value={ratio} /> : null;
                 })()}
-                {company.base_salary && company.base_salary !== 'N/A' && <DetailItem label="基本給" value={company.base_salary} />}
-                {isTruthy(company.fixed_overtime_system) && company.fixed_overtime_allowance && company.fixed_overtime_allowance !== 'N/A' && <DetailItem label="固定残業代" value={company.fixed_overtime_allowance} />}
               </div>
             </div>
 
