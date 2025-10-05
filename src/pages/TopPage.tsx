@@ -451,7 +451,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                   {visibleCount < displayedCompanies.length && (
                     <div className="load-more-container">
                       <button onClick={handleLoadMore} className="load-more-button">
-                        もっと表示する
+                        さらに表示する
                       </button>
                     </div>
                   )}
