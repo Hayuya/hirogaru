@@ -275,7 +275,16 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   };
 
   const handleScrollToFilters = () => {
-    filterRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (filterRef.current) {
+      const headerOffset = 100; // ヘッダーの高さ +α のオフセット
+      const elementPosition = filterRef.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const handleSortChange = useCallback((key: SortOption) => {
