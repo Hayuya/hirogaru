@@ -11,12 +11,44 @@ export const HeroSection: React.FC = () => {
         <div className="hero-content">
           <h2 className="hero-title">ひろがる企業研究リスト</h2>
           <p className="hero-subtitle">
-            広島で働く、未来をつくる。厳選した優良企業を限定でご紹介します。
-          </p>
-          <p className="hero-description">
-            給与、休日、福利厚生など、あなたの希望に合った企業を見つけましょう。
+            就活生の「いい会社ないかな？」に応える、広島の学生がつくった企業研究閲覧サイト
           </p>
         </div>
+
+        {/* === サイトの使い方ステップを追加 === */}
+        <div className="hero-steps">
+          <div className="step-item">
+            <div className="step-number-container">
+              <span className="step-number">01</span>
+            </div>
+            <div className="step-content">
+              <h3 className="step-title">LINEログインでフル活用</h3>
+              <p className="step-description">掲載企業の採用情報をまとめて無料で閲覧できます。</p>
+            </div>
+          </div>
+          <div className="step-arrow">→</div>
+          <div className="step-item">
+            <div className="step-number-container">
+              <span className="step-number">02</span>
+            </div>
+            <div className="step-content">
+              <h3 className="step-title">条件を絞って検索</h3>
+              <p className="step-description">休日数や福利厚生など、希望の条件に合う企業だけを効率的に探せます。</p>
+            </div>
+          </div>
+          <div className="step-arrow">→</div>
+          <div className="step-item">
+            <div className="step-number-container">
+              <span className="step-number">03</span>
+            </div>
+            <div className="step-content">
+              <h3 className="step-title">企業のリアルを知る</h3>
+              <p className="step-description">公式サイトや採用ページへ直接アクセスし、より多くの情報を得ましょう。</p>
+            </div>
+          </div>
+        </div>
+        {/* === ここまで追加 === */}
+
         <div className="hero-stats">
           <div className="stat-item">
             <span className="stat-number">100+</span>
