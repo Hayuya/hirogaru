@@ -83,7 +83,7 @@ const WelfareStatus: React.FC<{ count: number }> = ({ count }) => {
 const DetailItem: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div className="detail-item">
     <span className="detail-label">{label}</span>
-    <span className="detail-value">{formatValue(value as string | number)}</span>
+    <span className="detail-value">{value}</span>
   </div>
 );
 
@@ -176,29 +176,36 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
               )}
             </div>
 
-            <div className="detail-section">
-              <h4 className="detail-title">企業概要</h4>
-              <p className="detail-text">{formatValue(company.company_overview_120)}</p>
-            </div>
+            {company.company_overview_120 && company.company_overview_120 !== 'N/A' && (
+              <div className="detail-section">
+                <h4 className="detail-title">企業概要</h4>
+                <p className="detail-text">{company.company_overview_120}</p>
+              </div>
+            )}
 
-            <div className="detail-section">
-              <h4 className="detail-title">募集要項抜粋</h4>
-              <p className="detail-text">{formatValue(company.job_openings_excerpt)}</p>
-            </div>
+            {company.job_openings_excerpt && company.job_openings_excerpt !== 'N/A' && (
+              <div className="detail-section">
+                <h4 className="detail-title">募集要項抜粋</h4>
+                <p className="detail-text">{company.job_openings_excerpt}</p>
+              </div>
+            )}
 
             <div className="detail-section">
               <h4 className="detail-title">企業データ</h4>
               <div className="detail-grid">
-                <DetailItem label="初任給" value={company.starting_salary_graduates} />
-                <DetailItem label="従業員数" value={company.number_of_employees ? `${company.number_of_employees}名` : 'N/A'} />
-                <DetailItem label="本社所在地" value={company.headquarters_address} />
-                <DetailItem label="売上高" value={company.revenue} />
-                <DetailItem label="年間休日" value={company.annual_holidays ? `${company.annual_holidays}日` : 'N/A'} />
-                <DetailItem label="平均年齢" value={company.average_age ? `${company.average_age}歳` : 'N/A'} />
-                <DetailItem label="平均勤続年数" value={company.average_years_of_service ? `${company.average_years_of_service}年` : 'N/A'} />
-                <DetailItem label="男女比率" value={formatGenderRatio(company.gender_ratio)} />
-                <DetailItem label="基本給" value={company.base_salary} />
-                {isTruthy(company.fixed_overtime_system) && <DetailItem label="固定残業代" value={company.fixed_overtime_allowance} />}
+                {company.starting_salary_graduates && company.starting_salary_graduates !== 'N/A' && <DetailItem label="初任給" value={company.starting_salary_graduates} />}
+                {company.number_of_employees ? <DetailItem label="従業員数" value={`${company.number_of_employees}名`} /> : null}
+                {company.headquarters_address && company.headquarters_address !== 'N/A' && <DetailItem label="本社所在地" value={company.headquarters_address} />}
+                {company.revenue && company.revenue !== 'N/A' && <DetailItem label="売上高" value={company.revenue} />}
+                {company.annual_holidays ? <DetailItem label="年間休日" value={`${company.annual_holidays}日`} /> : null}
+                {company.average_age ? <DetailItem label="平均年齢" value={`${company.average_age}歳`} /> : null}
+                {company.average_years_of_service ? <DetailItem label="平均勤続年数" value={`${company.average_years_of_service}年`} /> : null}
+                {(() => {
+                  const ratio = formatGenderRatio(company.gender_ratio);
+                  return ratio !== '非公開' ? <DetailItem label="男女比率" value={ratio} /> : null;
+                })()}
+                {company.base_salary && company.base_salary !== 'N/A' && <DetailItem label="基本給" value={company.base_salary} />}
+                {isTruthy(company.fixed_overtime_system) && company.fixed_overtime_allowance && company.fixed_overtime_allowance !== 'N/A' && <DetailItem label="固定残業代" value={company.fixed_overtime_allowance} />}
               </div>
             </div>
 
@@ -215,15 +222,19 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
             </div>
 
 
-            <div className="detail-section">
-              <h4 className="detail-title">事業内容</h4>
-              <p className="detail-text">{formatValue(company.main_business_products)}</p>
-            </div>
+            {company.main_business_products && company.main_business_products !== 'N/A' && (
+              <div className="detail-section">
+                <h4 className="detail-title">事業内容</h4>
+                <p className="detail-text">{company.main_business_products}</p>
+              </div>
+            )}
 
-            <div className="detail-section">
-              <h4 className="detail-title">企業の強み・特徴</h4>
-              <p className="detail-text">{formatValue(company.strengths_unique_points)}</p>
-            </div>
+            {company.strengths_unique_points && company.strengths_unique_points !== 'N/A' && (
+              <div className="detail-section">
+                <h4 className="detail-title">企業の強み・特徴</h4>
+                <p className="detail-text">{company.strengths_unique_points}</p>
+              </div>
+            )}
 
             <div className="action-buttons">
               <a href={company.official_website_url} target="_blank" rel="noopener noreferrer" className="action-button primary">
