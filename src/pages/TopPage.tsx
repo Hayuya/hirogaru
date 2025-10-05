@@ -12,6 +12,7 @@ import { LineUserDetailForm } from '../components/LineUserDetailForm';
 import { createLineUserDetail, getLineUserDetail } from '../api/lineUserDetailApi';
 import { logLineAction } from '../api/lineActionApi';
 import { type ChartStats } from '../components/TriangleChart';
+import { SortNotification } from '../components/SortNotification';
 
 const SORT_LABEL_MAP: Record<SortOption, string> = {
   attractionScore: '総合魅力度',
@@ -60,7 +61,7 @@ const calculateScore = (value: number, mean: number, stdDev: number): number => 
     const normalized = (clampedZ + 1.5) / 3;
     return 20 + normalized * 80;
 };
-  
+
 const scoreToRating = (score: number): number => {
     return Math.min(5, Math.max(1, Math.round(score / 20)));
 };
@@ -96,6 +97,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     key: 'attractionScore',
     order: 'desc',
   });
+  const [notification, setNotification] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
   const isDetailGateActive = detailState === 'loading' || detailState === 'show-form' || detailState === 'error';
 
   const loadLineUserDetail = useCallback(async (lineUserId: string) => {
@@ -211,7 +213,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
         employees: isPrivateEmployees ? 2 : scoreToRating(scores.employees),
         holidays: isPrivateHolidays ? 2 : scoreToRating(scores.holidays),
       };
-    
+
       const attractionScore = parseFloat(((ratings.salary + ratings.holidays + ratings.employees) / 3).toFixed(1));
 
       return { ...company, attractionScore };
@@ -234,24 +236,24 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
 
     return processed;
   }, [companiesWithScores, filters]);
-  
+
   const displayedCompanies = useMemo(() => {
     let processed = [...filteredCompanies];
-  
+
     // 検索処理
     if (searchQuery) {
       processed = processed.filter(c =>
         c.company_name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-  
+
     // ソート処理
     processed.sort((a, b) => {
       const valA = sort.key === 'attractionScore' ? a.attractionScore ?? 0 : parseNumericValue(a[sort.key]);
       const valB = sort.key === 'attractionScore' ? b.attractionScore ?? 0 : parseNumericValue(b[sort.key]);
       return sort.order === 'asc' ? valA - valB : valB - valA;
     });
-  
+
     return processed;
   }, [filteredCompanies, searchQuery, sort]);
 
@@ -269,13 +271,15 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     setSort({ key, order });
     setVisibleCount(5); // 表示件数をリセット
 
+    const sortLabel = SORT_LABEL_MAP[key] ?? key;
+    setNotification({ show: true, message: `${sortLabel}に並べ替えました` });
+
     if (!authState.lineUserId) return;
 
-    const label = SORT_LABEL_MAP[key] ?? key;
-    const actionName = `button_click_sort-${label}`;
+    const actionName = `button_click_sort-${sortLabel}`;
     void logLineAction({ lineUserId: authState.lineUserId, actionName });
   }, [authState.lineUserId]);
-  
+
   const handleFilterChange = (key: keyof typeof filters, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -384,7 +388,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
               <p>{detailSuccessMessage}</p>
             </div>
           )}
-          
+
           {authState.isLoggedIn && (
             <>
               <FilterBar
@@ -437,7 +441,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                 <div className="no-results"><p>該当する企業が見つかりませんでした。</p></div>
               ) : (
                 <>
-                  <div className="companies-list">
+                  <div className={`companies-list`}>
                     {displayedCompanies.slice(0, visibleCount).map((company, index) => (
                       <CompanyCard
                         key={company.id}
@@ -459,7 +463,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                 </>
               )}
 
-              
+
               {shouldLockContent && (
                 <div id="login-prompt" className="login-prompt">
                   <div className="prompt-content">
@@ -506,6 +510,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
           )}
         </div>
       </main>
+      <SortNotification message={notification.message} show={notification.show} />
     </div>
   );
 };
