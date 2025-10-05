@@ -139,6 +139,8 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
 
   const attractionScore = company.attractionScore ?? 0;
 
+  const bonusInfo = [company.bonus_frequency_timing, company.bonus_previous_year_result].filter(Boolean).join(' / ');
+
   return (
     <div ref={cardRef} className={`company-card ${isRestricted ? 'restricted' : ''}`}>
       <div className="card-header">
@@ -224,11 +226,17 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
               <h4 className="detail-title">企業データ</h4>
               <div className="detail-grid">
                 {company.headquarters_address && company.headquarters_address !== 'N/A' && <DetailItem label="本社所在地" value={company.headquarters_address} />}
+                {company.work_location && company.work_location !== 'N/A' && <DetailItem label="勤務地" value={company.work_location} />}
+                {company.relocation && company.relocation !== 'N/A' && <DetailItem label="転勤" value={company.relocation} />}
                 {company.number_of_employees ? <DetailItem label="従業員数" value={`${company.number_of_employees}名`} /> : null}
                 {company.revenue && company.revenue !== 'N/A' && <DetailItem label="売上高" value={company.revenue} />}
                 {company.starting_salary_graduates && company.starting_salary_graduates !== 'N/A' && <DetailItem label="初任給" value={company.starting_salary_graduates} />}
                 {isTruthy(company.fixed_overtime_system) && company.fixed_overtime_allowance && company.fixed_overtime_allowance !== 'N/A' && <DetailItem label="固定残業代" value={company.fixed_overtime_allowance} />}
+                {bonusInfo && bonusInfo !== 'N/A' && <DetailItem label="賞与" value={bonusInfo} />}
                 {company.annual_holidays ? <DetailItem label="年間休日" value={`${company.annual_holidays}日`} /> : null}
+                {company.average_paid_leave_days ? <DetailItem label="平均有給取得日数" value={`${company.average_paid_leave_days}日`} /> : null}
+                {company.paid_leave_usage_rate ? <DetailItem label="有給休暇取得率" value={`${company.paid_leave_usage_rate}%`} /> : null}
+                {company.average_overtime_hours ? <DetailItem label="平均残業時間" value={`${company.average_overtime_hours}時間`} /> : null}
                 {company.average_age ? <DetailItem label="平均年齢" value={`${company.average_age}歳`} /> : null}
                 {company.average_years_of_service ? <DetailItem label="平均勤続年数" value={`${company.average_years_of_service}年`} /> : null}
                 {(() => {
@@ -264,6 +272,13 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
                 <p className="detail-text">{company.strengths_unique_points}</p>
               </div>
             )}
+            
+            {company.future_prospects && company.future_prospects !== 'N/A' && (
+              <div className="detail-section">
+                <h4 className="detail-title">今後の展望</h4>
+                <p className="detail-text">{company.future_prospects}</p>
+              </div>
+            )}
 
             <div className="action-buttons">
               <a href={company.official_website_url} target="_blank" rel="noopener noreferrer" className="action-button primary">
@@ -272,6 +287,11 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
               <a href={company.recruitment_page_url} target="_blank" rel="noopener noreferrer" className="action-button secondary">
                 採用情報を見る
               </a>
+              {company.reference_url_mynavi_rikunavi && company.reference_url_mynavi_rikunavi !== 'N/A' && (
+                <a href={company.reference_url_mynavi_rikunavi} target="_blank" rel="noopener noreferrer" className="action-button secondary">
+                  マイナビ/リクナビで見る
+                </a>
+              )}
             </div>
 
             <button
