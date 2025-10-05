@@ -21,7 +21,7 @@ const scoreToRating = (score: number): number => {
   return Math.min(5, Math.max(1, Math.round(score / 20)));
 };
 
-// Get color based on rating (1-5) - 元のグラデーションに戻す
+// Get color based on rating (1-5) - 元のグラデーションに戻す　
 const getRatingColor = (rating: number): string => {
   switch (rating) {
     case 5: return '#EF4444'; // 赤
