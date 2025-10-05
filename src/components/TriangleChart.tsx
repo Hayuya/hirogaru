@@ -16,7 +16,7 @@ const calculateScore = (value: number, mean: number, stdDev: number): number => 
   return 20 + normalized * 80;
 };
 
-// Convert 0-100 score to 1-5 rating
+// Convert 0-100 score to 1-5 ratzing
 const scoreToRating = (score: number): number => {
   return Math.min(5, Math.max(1, Math.round(score / 20)));
 };
