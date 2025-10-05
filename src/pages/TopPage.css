@@ -78,7 +78,11 @@
 
 .load-more-container {
   text-align: center;
-  margin-top: 24px;
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 .load-more-button {
@@ -99,7 +103,25 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* ★★★ このブロックを追加 ★★★ */
+.scroll-to-filters-button {
+  padding: 10px 28px;
+  background: none;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.scroll-to-filters-button:hover {
+  background: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+
+/* --- Overlay Styles --- */
 .line-user-detail-overlay {
   position: fixed;
   top: 0;
@@ -141,4 +163,3 @@
   border-radius: 8px;
   font-weight: 600;
 }
-/* ★★★ ここまで ★★★ */

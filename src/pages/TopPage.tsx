@@ -81,6 +81,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   const [isSubmittingDetail, setIsSubmittingDetail] = useState(false);
   const originalOverflowRef = useRef<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(5);
+  const filterRef = useRef<HTMLDivElement>(null); // スクロールターゲット用のref
 
   // フィルター・ソート・検索のState
   const [searchQuery, setSearchQuery] = useState('');
@@ -273,6 +274,10 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     setVisibleCount(prevCount => prevCount + 5);
   };
 
+  const handleScrollToFilters = () => {
+    filterRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const handleSortChange = useCallback((key: SortOption) => {
     const order = 'desc';
     setSort({ key, order });
@@ -397,7 +402,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
           )}
 
           {authState.isLoggedIn && (
-            <>
+            <div ref={filterRef}>
               <FilterBar
                 selectedIndustries={filters.selectedIndustries}
                 filters={{
@@ -421,7 +426,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                 totalCount={displayedCompanies.length}
                 onSortChange={handleSortChange}
               />
-            </>
+            </div>
           )}
 
           {authState.isLoggedIn && !authState.isFriend && (
@@ -464,6 +469,9 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                     <div className="load-more-container">
                       <button onClick={handleLoadMore} className="load-more-button">
                         さらに表示する
+                      </button>
+                      <button onClick={handleScrollToFilters} className="scroll-to-filters-button">
+                        条件選択に戻る
                       </button>
                     </div>
                   )}
