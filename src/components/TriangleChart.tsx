@@ -96,9 +96,9 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats, is
 
   // 5段階評価に変換（非公開の場合は3固定）
   let ratings = {
-    salary: isPrivateSalary ? 3 : scoreToRating(scores.salary),
-    employees: isPrivateEmployees ? 3 : scoreToRating(scores.employees),
-    holidays: isPrivateHolidays ? 3 : scoreToRating(scores.holidays),
+    salary: isPrivateSalary ? 2 : scoreToRating(scores.salary),
+    employees: isPrivateEmployees ? 2 : scoreToRating(scores.employees),
+    holidays: isPrivateHolidays ? 2 : scoreToRating(scores.holidays),
   };
 
   // isDemoがtrueの場合、評価を固定値で上書き
@@ -124,9 +124,9 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats, is
   // 注意書きメッセージの生成
   const noteMessages: string[] = [];
   if (!isDemo) {
-    if (isPrivateSalary) noteMessages.push('給与は非公開のため3とする');
-    if (isPrivateHolidays) noteMessages.push('休日は非公開のため3とする');
-    if (isPrivateEmployees) noteMessages.push('規模は非公開のため3とする');
+    if (isPrivateSalary) noteMessages.push('給与は非公開のため2とする');
+    if (isPrivateHolidays) noteMessages.push('休日は非公開のため2とする');
+    if (isPrivateEmployees) noteMessages.push('規模は非公開のため2とする');
   }
 
 

@@ -145,9 +145,9 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
   };
 
   let ratings = {
-    salary: isPrivateSalary ? 3 : scoreToRating(scores.salary),
-    employees: isPrivateEmployees ? 3 : scoreToRating(scores.employees),
-    holidays: isPrivateHolidays ? 3 : scoreToRating(scores.holidays),
+    salary: isPrivateSalary ? 2 : scoreToRating(scores.salary),
+    employees: isPrivateEmployees ? 2 : scoreToRating(scores.employees),
+    holidays: isPrivateHolidays ? 2 : scoreToRating(scores.holidays),
   };
 
   if (isRestricted) {
