@@ -49,7 +49,7 @@ function App() {
   // UPDATED: Changed the document title
   useEffect(() => {
     if (route === '/') {
-      document.title = '広島就活ナビ | 広島の優良企業と出会う就活サイト';
+      document.title = 'ジモトデ就活 | 広島の優良企業と出会う就活サイト';
     }
   }, [route]);
 

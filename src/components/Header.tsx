@@ -1,6 +1,7 @@
 import React from 'react';
 import './Header.css';
 import type { AuthState } from '../types/auth';
+import logo from '../assets/logo.png'; // ロゴをインポート
 
 interface HeaderProps {
   authState: AuthState;
@@ -30,11 +31,7 @@ export const Header: React.FC<HeaderProps> = ({ authState }) => {
       )}
       <div className="header-inner">
         <div className="header-brand">
-          <span className="brand-mark">🎓</span>
-          <div className="brand-text">
-            <span className="brand-title">広島就活ナビ</span>
-            <span className="brand-subtitle">地方の就活パートナー</span>
-          </div>
+          <img src={logo} alt="ジモトデ就活" className="brand-logo" />
         </div>
       </div>
     </header>

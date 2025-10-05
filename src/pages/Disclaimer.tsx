@@ -8,7 +8,7 @@ interface DisclaimerProps {
 
 export const Disclaimer: React.FC<DisclaimerProps> = ({ onNavigate }) => {
   useEffect(() => {
-    document.title = '免責事項 | ジモトデ';
+    document.title = '免責事項 | ジモトデ就活';
   }, []);
 
   return (

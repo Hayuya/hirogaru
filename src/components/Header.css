@@ -19,7 +19,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-right: auto;
+  margin-right: auto; /* ロゴを左寄せに戻す */
+}
+
+.brand-logo {
+  height: 40px; /* ロゴの高さを調整 */
 }
 
 .brand-mark {
