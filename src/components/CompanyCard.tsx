@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// hayuya/hirogaru/hirogaru-e2d324070807b009b5cf4500bff0b5674dff50ae/src/components/CompanyCard.tsx
+
+import React, { useState, useRef, useEffect } from 'react';
 import type { Company } from '../types/company';
 import { TriangleChart, type ChartStats } from './TriangleChart';
 import './CompanyCard.css';
@@ -98,6 +100,37 @@ const BooleanFeatureTag: React.FC<{ isAvailable: boolean; label: string }> = ({ 
 
 export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted, displayRank, onViewDetails, chartStats }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const wasExpanded = useRef(false);
+
+  useEffect(() => {
+    // Check if the card was expanded and is now closed.
+    if (wasExpanded.current && !isExpanded && cardRef.current) {
+      const cardElement = cardRef.current;
+      const nextSibling = cardElement.nextElementSibling as HTMLElement;
+
+      if (nextSibling) {
+        const cardRect = cardElement.getBoundingClientRect();
+        const nextRect = nextSibling.getBoundingClientRect();
+        
+        // Midpoint of the vertical space between the bottom of the current card and the top of the next card.
+        const gapCenter = (cardRect.bottom + nextRect.top) / 2;
+        
+        // Desired position for the center of the viewport.
+        const viewportCenter = window.innerHeight / 2;
+        
+        // How much to scroll to align the gap center with the viewport center.
+        const scrollAmount = gapCenter - viewportCenter;
+        
+        window.scrollBy({
+          top: scrollAmount,
+          behavior: 'smooth',
+        });
+      }
+    }
+    // Update the wasExpanded ref for the next render.
+    wasExpanded.current = isExpanded;
+  }, [isExpanded]);
 
   const toggleExpanded = () => {
     // 常に詳細の開閉を可能にする
@@ -110,7 +143,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
   const attractionScore = company.attractionScore ?? 0;
 
   return (
-    <div className={`company-card ${isRestricted ? 'restricted' : ''}`}>
+    <div ref={cardRef} className={`company-card ${isRestricted ? 'restricted' : ''}`}>
       <div className="card-header">
         <div className="rank-badge">
           <span className="rank-number">{displayRank}</span>
