@@ -30,6 +30,25 @@ const isTruthy = (value: any): boolean => {
     return String(value).toLowerCase() === 'true';
 }
 
+const parseNumericValue = (value: string | number | undefined | null): number => {
+  if (typeof value === 'number') return value;
+  if (!value) return 0;
+  const match = String(value).match(/[\d,.]+/);
+  return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
+};
+
+const calculateScore = (value: number, mean: number, stdDev: number): number => {
+  const zScore = stdDev === 0 ? 0 : (value - mean) / stdDev;
+  const clampedZ = Math.max(-1.5, Math.min(1.5, zScore));
+  const normalized = (clampedZ + 1.5) / 3;
+  return 20 + normalized * 80;
+};
+
+// Convert 0-100 score to 1-5 rating
+const scoreToRating = (score: number): number => {
+  return Math.min(5, Math.max(1, Math.round(score / 20)));
+};
+
 
 const formatGenderRatio = (ratioStr: string): string => {
   if (!ratioStr || ratioStr === "非公開" || ratioStr === "N/A") {
@@ -48,6 +67,35 @@ const formatGenderRatio = (ratioStr: string): string => {
 
   const femalePercentage = (female / (male + female)) * 100;
   return `女性 ${femalePercentage.toFixed(1)}%`;
+};
+
+// Helper to count available welfare features
+const countWelfareFeatures = (company: Company): number => {
+  const features = [
+    company.housing_allowance,
+    company.remote_work,
+    company.flextime,
+    company.special_leave,
+    company.qualification_support,
+  ];
+  return features.filter(isTruthy).length;
+};
+
+// New component for the visual display
+const WelfareStatus: React.FC<{ count: number }> = ({ count }) => {
+  const getColorClass = (num: number) => {
+    if (num >= 4) return 'high';
+    if (num >= 2) return 'medium';
+    return 'low';
+  };
+
+  return (
+    <div className={`welfare-status ${getColorClass(count)}`}>
+      <span className="welfare-count">{count}</span>
+      <span className="welfare-total">/ 5個</span>
+      <span className="welfare-label">の制度あり</span>
+    </div>
+  );
 };
 
 const DetailItem: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
@@ -77,9 +125,36 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
     setIsExpanded(!isExpanded);
   };
 
-  const ratingDisplay = typeof company.rating === 'number'
-    ? `${company.rating.toFixed(2)} / 5.0`
-    : '評価なし';
+  // --- Attraction Score Calculation ---
+  const salaryValue = parseNumericValue(company.base_salary);
+  const employeesValue = company.number_of_employees;
+  const holidaysValue = company.annual_holidays;
+
+  const isPrivateSalary = salaryValue <= 0;
+  const isPrivateEmployees = employeesValue <= 0;
+  const isPrivateHolidays = holidaysValue <= 0;
+
+  const effectiveSalaryValue = isPrivateSalary ? chartStats.salary.mean : salaryValue;
+  const effectiveEmployeesValue = isPrivateEmployees ? Math.pow(10, chartStats.employees.mean) : employeesValue;
+  const effectiveHolidaysValue = isPrivateHolidays ? chartStats.holidays.mean : holidaysValue;
+
+  const scores = {
+    salary: isPrivateSalary ? 60 : calculateScore(effectiveSalaryValue, chartStats.salary.mean, chartStats.salary.stdDev),
+    employees: isPrivateEmployees ? 60 : calculateScore(Math.log10(effectiveEmployeesValue), chartStats.employees.mean, chartStats.employees.stdDev),
+    holidays: isPrivateHolidays ? 60 : calculateScore(effectiveHolidaysValue, chartStats.holidays.mean, chartStats.holidays.stdDev),
+  };
+
+  let ratings = {
+    salary: isPrivateSalary ? 3 : scoreToRating(scores.salary),
+    employees: isPrivateEmployees ? 3 : scoreToRating(scores.employees),
+    holidays: isPrivateHolidays ? 3 : scoreToRating(scores.holidays),
+  };
+
+  if (isRestricted) {
+    ratings = { salary: 4, holidays: 4, employees: 3 };
+  }
+
+  const attractionScore = ((ratings.salary + ratings.holidays + ratings.employees) / 3).toFixed(1);
 
   return (
     <div className={`company-card ${isRestricted ? 'restricted' : ''}`}>
@@ -95,8 +170,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
             {isTruthy(company.fixed_overtime_system) && <span className="fixed-overtime-tag">固定残業代あり</span>}
             <div className="rating">
               <span className="rating-stars">★</span>
-              <span className="rating-value">{ratingDisplay}</span>
-              <span className="review-count">({company.employee_reviews_count || 0}件)</span>
+              <span className="rating-value">{attractionScore} / 5.0</span>
             </div>
           </div>
         </div>
@@ -173,14 +247,15 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
             </div>
 
             <div className="detail-section">
-                <h4 className="detail-title">働き方・制度</h4>
-                <div className="boolean-features-grid">
-                    {isTruthy(company.housing_allowance) && <BooleanFeatureTag isAvailable={true} label="住宅手当" />}
-                    {isTruthy(company.remote_work) && <BooleanFeatureTag isAvailable={true} label="リモートワーク" />}
-                    {isTruthy(company.flextime) && <BooleanFeatureTag isAvailable={true} label="フレックスタイム" />}
-                    {isTruthy(company.special_leave) && <BooleanFeatureTag isAvailable={true} label="特別休暇" />}
-                    {isTruthy(company.qualification_support) && <BooleanFeatureTag isAvailable={true} label="資格取得支援" />}
-                </div>
+              <h4 className="detail-title">働き方・制度</h4>
+              <WelfareStatus count={countWelfareFeatures(company)} />
+              <div className="boolean-features-grid">
+                  {isTruthy(company.housing_allowance) && <BooleanFeatureTag isAvailable={true} label="住宅手当" />}
+                  {isTruthy(company.remote_work) && <BooleanFeatureTag isAvailable={true} label="リモートワーク" />}
+                  {isTruthy(company.flextime) && <BooleanFeatureTag isAvailable={true} label="フレックスタイム" />}
+                  {isTruthy(company.special_leave) && <BooleanFeatureTag isAvailable={true} label="特別休暇" />}
+                  {isTruthy(company.qualification_support) && <BooleanFeatureTag isAvailable={true} label="資格取得支援" />}
+              </div>
             </div>
 
 

@@ -3,8 +3,6 @@ export interface Company {
   rank: number;
   company_name: string;
   industry: string;
-  rating: number;
-  employee_reviews_count: number;
   starting_salary_graduates: string;
   annual_holidays: number;
   average_overtime_hours: number;
