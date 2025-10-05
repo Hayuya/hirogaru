@@ -168,10 +168,12 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
           <div className="company-meta">
             <span className="industry-badge">{company.industry}</span>
             {isTruthy(company.fixed_overtime_system) && <span className="fixed-overtime-tag">固定残業代あり</span>}
-            <div className="rating">
-              <span className="rating-stars">★</span>
-              <span className="rating-value">{attractionScore} / 5.0</span>
-            </div>
+            {!isRestricted && (
+              <div className="rating">
+                <span className="rating-stars">★</span>
+                <span className="rating-value">{attractionScore} / 5.0</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
