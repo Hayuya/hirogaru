@@ -208,10 +208,17 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
         holidays: isPrivateHolidays ? 60 : calculateScore(holidaysValue, chartStats.holidays.mean, chartStats.holidays.stdDev),
       };
 
+      const holidaysRating =
+        !isPrivateHolidays && holidaysValue >= 125
+          ? 5
+          : isPrivateHolidays
+          ? 2
+          : scoreToRating(scores.holidays);
+
       const ratings = {
         salary: isPrivateSalary ? 2 : scoreToRating(scores.salary),
         employees: isPrivateEmployees ? 2 : scoreToRating(scores.employees),
-        holidays: isPrivateHolidays ? 2 : scoreToRating(scores.holidays),
+        holidays: holidaysRating,
       };
 
       const attractionScore = parseFloat(((ratings.salary + ratings.holidays + ratings.employees) / 3).toFixed(1));

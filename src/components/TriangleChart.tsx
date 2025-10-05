@@ -95,10 +95,17 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats, is
   };
 
   // 5段階評価に変換（非公開の場合は3固定）
+  const holidaysRating =
+    !isPrivateHolidays && holidaysValue >= 125
+      ? 5
+      : isPrivateHolidays
+      ? 2
+      : scoreToRating(scores.holidays);
+
   let ratings = {
     salary: isPrivateSalary ? 2 : scoreToRating(scores.salary),
     employees: isPrivateEmployees ? 2 : scoreToRating(scores.employees),
-    holidays: isPrivateHolidays ? 2 : scoreToRating(scores.holidays),
+    holidays: holidaysRating,
   };
 
   // isDemoがtrueの場合、評価を固定値で上書き
