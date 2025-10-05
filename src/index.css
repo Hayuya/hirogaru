@@ -7,6 +7,12 @@
   box-sizing: border-box;
 }
 
+/* ★★★ このブロックを追加 ★★★ */
+html {
+  overflow-y: scroll;
+}
+/* ★★★ ここまで ★★★ */
+
 :root {
   /* カラーパレットを落ち着いたブルーベースに調整 */
   --primary-color: #1F4B8C; /* 穏やかなディープブルー */
