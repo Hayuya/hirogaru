@@ -468,7 +468,13 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                         <p>
                           すべての企業情報をご覧いただくには、LINE公式アカウントの友だち追加と、そのアカウントでのログインが必要です。
                           <br />
-                          まずはLINEで友だち追加後、ログインをお願いします。
+                          1. LINE友達追加ボタンのQRコードを読み取り、友だち追加を行ってください。
+                          <br />
+                          2. 友だち追加後、ログインボタンからLINEアカウントでログインしてください。
+                          <br />
+                          ※スマホのLINEトーク画面からもアクセスできます。
+                          <br />
+                          ※すでに友だちの場合は、すぐにログインできます。
                         </p>
                         <div className="prompt-buttons">
                           <a href="https://lin.ee/eiuBq0X" className="add-friend-button-main" target="_blank" rel="noopener noreferrer">
