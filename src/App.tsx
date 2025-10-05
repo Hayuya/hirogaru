@@ -19,6 +19,7 @@ const resolveCurrentRoute = (): AppRoute => {
 };
 
 function App() {
+  const [appIsLoading, setAppIsLoading] = useState(true); // ★ アプリ全体のローディング状態を追加
   const [route, setRoute] = useState<AppRoute>(() => resolveCurrentRoute());
   const [authState, setAuthState] = useState<AuthState>({
     isInitialized: false, isLoggedIn: false, user: null, lineUserId: null, isFriend: false, error: null,
@@ -28,6 +29,7 @@ function App() {
     const initAuth = async () => {
       const state = await authManager.initialize();
       setAuthState(state);
+      setAppIsLoading(false); // ★ 初期化が完了したらローディングを解除
     };
     initAuth();
   }, []);
@@ -70,7 +72,8 @@ function App() {
   }, [route, handleNavigate, authState]);
 
   return (
-    <div className="App">
+    // ★ ローディング状態に応じてクラスを付与
+    <div className={`App ${appIsLoading ? 'is-loading' : ''}`}>
       <Header authState={authState} />
       {content}
     </div>

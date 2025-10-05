@@ -1,4 +1,10 @@
 .App {
   min-height: 100vh;
   background-color: var(--background-color);
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.App.is-loading {
+  opacity: 0;
 }
