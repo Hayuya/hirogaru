@@ -97,7 +97,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     key: 'attractionScore',
     order: 'desc',
   });
-  const [notification, setNotification] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
+  const [notification, setNotification] = useState<{ key: number; message: string }>({ key: 0, message: '' });
   const isDetailGateActive = detailState === 'loading' || detailState === 'show-form' || detailState === 'error';
 
   const loadLineUserDetail = useCallback(async (lineUserId: string) => {
@@ -272,7 +272,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     setVisibleCount(5); // 表示件数をリセット
 
     const sortLabel = SORT_LABEL_MAP[key] ?? key;
-    setNotification({ show: true, message: `${sortLabel}に並べ替えました` });
+    setNotification(prev => ({ key: prev.key + 1, message: `${sortLabel}に並べ替えました` }));
 
     if (!authState.lineUserId) return;
 
@@ -510,7 +510,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
           )}
         </div>
       </main>
-      <SortNotification message={notification.message} show={notification.show} />
+      <SortNotification notificationKey={notification.key} message={notification.message} />
     </div>
   );
 };
