@@ -11,56 +11,69 @@ export const HeroSection: React.FC = () => {
         <div className="hero-content">
           <h2 className="hero-title">ひろがる企業研究リスト</h2>
           <p className="hero-subtitle">
-            就活生の「いい会社ないかな？」に応える、広島の学生がつくった企業研究閲覧サイト
+            就活生の「いい企業ないかな？」に応える
+            広島の学生がつくった企業研究閲覧サイト
           </p>
         </div>
-
-        {/* === サイトの使い方ステップを追加 === */}
         <div className="hero-steps">
           <div className="step-item">
-            <div className="step-number-container">
-              <span className="step-number">01</span>
-            </div>
+            <div className="step-number">1</div>
             <div className="step-content">
-              <h3 className="step-title">LINEログインでフル活用</h3>
-              <p className="step-description">掲載企業の採用情報をまとめて無料で閲覧できます。</p>
+              <div className="step-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <h3 className="step-title">LINEログイン</h3>
+              <p className="step-description">企業研究を<br/>無料で閲覧</p>
             </div>
           </div>
-          <div className="step-arrow">→</div>
+          <div className="step-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+            </svg>
+          </div>
           <div className="step-item">
-            <div className="step-number-container">
-              <span className="step-number">02</span>
-            </div>
+            <div className="step-number">2</div>
             <div className="step-content">
-              <h3 className="step-title">条件を絞って検索</h3>
-              <p className="step-description">休日数や福利厚生など、希望の条件に合う企業だけを効率的に探せます。</p>
+              <div className="step-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+              </div>
+              <h3 className="step-title">カスタム検索</h3>
+              <p className="step-description">ピンと来る<br/>企業を探す</p>
             </div>
           </div>
-          <div className="step-arrow">→</div>
+          <div className="step-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+            </svg>
+          </div>
           <div className="step-item">
-            <div className="step-number-container">
-              <span className="step-number">03</span>
-            </div>
+            <div className="step-number">3</div>
             <div className="step-content">
-              <h3 className="step-title">企業のリアルを知る</h3>
-              <p className="step-description">公式サイトや採用ページへ直接アクセスし、より多くの情報を得ましょう。</p>
+              <div className="step-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                </svg>
+              </div>
+              <h3 className="step-title">企業情報を深掘り</h3>
+              <p className="step-description">企業HPやナビサイト<br/>に直接アクセス</p>
             </div>
           </div>
         </div>
-        {/* === ここまで追加 === */}
-
-        <div className="hero-stats">
-          <div className="stat-item">
-            <span className="stat-number">100+</span>
-            <span className="stat-label">掲載企業数</span>
+        <div className="hero-stats-simple">
+          <div className="stat-simple">
+            <strong>100+</strong> 掲載企業数
           </div>
-          <div className="stat-item">
-            <span className="stat-number">250+</span>
-            <span className="stat-label">求人情報</span>
+          <div className="stat-divider">•</div>
+          <div className="stat-simple">
+            <strong>250+</strong> 求人情報
           </div>
-          <div className="stat-item">
-            <span className="stat-number">1,000+</span>
-            <span className="stat-label">登録学生数</span>
+          <div className="stat-divider">•</div>
+          <div className="stat-simple">
+            <strong>1,000+</strong> 登録学生数
           </div>
         </div>
       </div>
