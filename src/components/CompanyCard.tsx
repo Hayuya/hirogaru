@@ -1,5 +1,3 @@
-// hayuya/hirogaru/hirogaru-e2d324070807b009b5cf4500bff0b5674dff50ae/src/components/CompanyCard.tsx
-
 import React, { useState, useRef, useEffect } from 'react';
 import type { Company } from '../types/company';
 import { TriangleChart, type ChartStats } from './TriangleChart';
@@ -124,7 +122,6 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
         
         window.scrollBy({
           top: scrollAmount,
-          behavior: 'smooth',
         });
       }
     }
