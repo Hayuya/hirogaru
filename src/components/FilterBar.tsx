@@ -23,6 +23,19 @@ interface FilterBarProps {
   searchableCompanyCount: number;
 }
 
+const FilterIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+  </svg>
+);
+
+const SearchIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+);
+
 export const FilterBar: React.FC<FilterBarProps> = ({
   selectedIndustries,
   filters,
@@ -59,14 +72,17 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const activeWelfareCount = Object.values(filters).filter(v => v).length;
 
   return (
-    <div className="filter-bar">
-      <div className="filter-section">
-        <h3 className="filter-title">条件で絞り込み</h3>
-        <div className="collapsible-wrapper">
+    <div className="filter-container">
+      <div className="filter-card">
+        <h3 className="filter-card-title">
+          <FilterIcon />
+          <span>条件で絞り込み</span>
+        </h3>
+        <div className="filter-card-content">
           <div className="collapsible-section">
             <button className="section-header" onClick={() => setIndustryOpen(!isIndustryOpen)}>
               <div className="section-header-title">
-                <h3 className="filter-title">○ 業界カテゴリーで絞る</h3>
+                <span className="section-title">○ 業界カテゴリーで絞る</span>
                 {activeIndustryCount > 0 && <span className="active-filter-badge">{activeIndustryCount}</span>}
               </div>
               <span className={`chevron ${isIndustryOpen ? 'open' : ''}`}>▼</span>
@@ -97,7 +113,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <div className="collapsible-section">
             <button className="section-header" onClick={() => setWelfareOpen(!isWelfareOpen)}>
               <div className="section-header-title">
-                <h3 className="filter-title">○ 働き方・制度で絞る</h3>
+                <span className="section-title">○ 働き方・制度で絞る</span>
                 {activeWelfareCount > 0 && <span className="active-filter-badge">{activeWelfareCount}</span>}
               </div>
               <span className={`chevron ${isWelfareOpen ? 'open' : ''}`}>▼</span>
@@ -141,8 +157,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         </div>
       </div>
 
-      <div className="filter-section">
-        <h3 className="filter-title">企業名で検索</h3>
+      <div className="filter-card">
+        <h3 className="filter-card-title">
+          <SearchIcon />
+          <span>企業名で検索</span>
+        </h3>
         <div className="search-form">
           <input
             type="text"

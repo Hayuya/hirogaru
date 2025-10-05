@@ -1,29 +1,36 @@
-.filter-bar {
+/* デザインを全面的に刷新 */
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.filter-card {
   background: white;
   border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
 }
 
-.filter-section {
-  margin-bottom: 20px;
-}
-
-.filter-section:last-child {
-  margin-bottom: 0;
-}
-
-.filter-title {
-  font-size: 14px;
+.filter-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--text-secondary);
-  margin: 0; /* Remove margin */
-  padding: 0 8px; /* Add horizontal padding */
+  color: var(--text-primary);
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.collapsible-wrapper {
-  padding-top: 12px;
+.filter-card-title svg {
+  color: var(--primary-color);
+}
+
+.filter-card-content {
+  padding: 0 16px;
 }
 
 /* --- Collapsible Section --- */
@@ -39,7 +46,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 8px;
+  padding: 16px 0;
   background: none;
   border: none;
   cursor: pointer;
@@ -51,9 +58,10 @@
   gap: 8px;
 }
 
-.filter-icon {
-  font-size: 16px;
-  color: var(--text-secondary);
+.section-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
 .active-filter-badge {
@@ -67,14 +75,6 @@
   text-align: center;
 }
 
-.section-header .filter-title {
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--text-primary);
-  font-size: 16px;
-  padding: 0;
-}
-
 .chevron {
   transition: transform 0.3s ease;
   font-size: 12px;
@@ -86,7 +86,7 @@
 }
 
 .section-content {
-  padding: 0 8px 16px;
+  padding: 0 0 16px;
   animation: fadeIn 0.3s ease;
 }
 
@@ -95,11 +95,12 @@
   to { opacity: 1; }
 }
 
-
+/* --- Tags & Checkboxes --- */
 .industry-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  padding-top: 8px;
 }
 
 .industry-tag {
@@ -131,9 +132,10 @@
 }
 
 .checkbox-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding-top: 8px;
 }
 
 .checkbox-label {
@@ -173,13 +175,10 @@
   color: var(--text-primary);
 }
 
+/* --- Search Section --- */
 .search-form {
   position: relative;
-  padding: 16px 8px 8px;
-}
-.search-form .filter-title {
-  padding: 0;
-  margin-bottom: 12px;
+  padding: 16px 0;
 }
 
 .search-input {
@@ -197,23 +196,10 @@
   box-shadow: 0 0 0 3px var(--primary-light);
 }
 
-/* レスポンシブ対応 */
+/* --- Responsive --- */
 @media (max-width: 768px) {
-  .filter-bar {
-    padding: 0 8px;
-  }
-  
-  .industry-tags {
-    gap: 6px;
-  }
-  
-  .industry-tag {
-    padding: 5px 12px;
-    font-size: 12px;
-  }
-  
   .checkbox-filters {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 12px;
   }
 }
