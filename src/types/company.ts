@@ -50,7 +50,6 @@ export type SortOption =
   | 'starting_salary_graduates'
   | 'revenue'
   | 'number_of_employees'
-  | 'average_overtime_hours'
   | 'average_years_of_service'
   | 'average_age'
   | 'annual_holidays'

@@ -17,7 +17,6 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: 'average_paid_leave_days', label: '有給取得日数が多い順' },
   { value: 'average_years_of_service', label: '勤続年数が長い順' },
   { value: 'average_age', label: '平均年齢が高い順' },
-  { value: 'average_overtime_hours', label: '残業時間が短い順' },
 ];
 
 export const SortBar: React.FC<SortBarProps> = ({

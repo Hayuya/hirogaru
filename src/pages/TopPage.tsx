@@ -18,7 +18,6 @@ const SORT_LABEL_MAP: Record<SortOption, string> = {
   starting_salary_graduates: '初任給',
   revenue: '売上高',
   number_of_employees: '従業員数',
-  average_overtime_hours: '残業時間',
   average_years_of_service: '平均勤続年数',
   average_age: '平均年齢',
   annual_holidays: '年間休日',
@@ -266,7 +265,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   };
 
   const handleSortChange = useCallback((key: SortOption) => {
-    const order = key === 'average_overtime_hours' ? 'asc' : 'desc';
+    const order = 'desc';
     setSort({ key, order });
     setVisibleCount(5); // 表示件数をリセット
 
