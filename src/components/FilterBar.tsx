@@ -82,7 +82,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <div className="collapsible-section">
             <button className="section-header" onClick={() => setIndustryOpen(!isIndustryOpen)}>
               <div className="section-header-title">
-                <span className="section-title">○ 業界カテゴリーで絞る</span>
+                <span className="section-title">☑︎ 業界カテゴリーで絞る</span>
                 {activeIndustryCount > 0 && <span className="active-filter-badge">{activeIndustryCount}</span>}
               </div>
               <span className={`chevron ${isIndustryOpen ? 'open' : ''}`}>▼</span>
@@ -113,7 +113,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <div className="collapsible-section">
             <button className="section-header" onClick={() => setWelfareOpen(!isWelfareOpen)}>
               <div className="section-header-title">
-                <span className="section-title">○ 働き方・制度で絞る</span>
+                <span className="section-title">☑︎ 働き方・制度で絞る</span>
                 {activeWelfareCount > 0 && <span className="active-filter-badge">{activeWelfareCount}</span>}
               </div>
               <span className={`chevron ${isWelfareOpen ? 'open' : ''}`}>▼</span>
