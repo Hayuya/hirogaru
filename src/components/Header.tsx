@@ -15,9 +15,13 @@ export const Header: React.FC<HeaderProps> = ({ authState }) => {
     }
   };
 
+  // バナーが表示されるべきかどうかを判断するフラグ
+  const isPromptVisible = authState.isInitialized && !authState.isLoggedIn;
+
   return (
     <header className="header">
-      {authState.isInitialized && !authState.isLoggedIn && (
+      {/* 常にラッパーは存在させ、'visible'クラスで表示を制御 */}
+      <div className={`friend-prompt-wrapper ${isPromptVisible ? 'visible' : ''}`}>
         <div className="friend-prompt">
           <div className="prompt-inner">
             <p>
@@ -28,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ authState }) => {
             </button>
           </div>
         </div>
-      )}
+      </div>
       <div className="header-inner">
         <div className="header-brand">
           <img src={logo} alt="ジモトデ就活" className="brand-logo" />

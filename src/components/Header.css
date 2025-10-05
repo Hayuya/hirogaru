@@ -96,12 +96,24 @@
   transform: translateY(-1px);
 }
 
+/* --- ADDED FOR SMOOTH ANIMATION --- */
+.friend-prompt-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s ease-in-out;
+}
+
+.friend-prompt-wrapper.visible {
+  grid-template-rows: 1fr;
+}
+
 .friend-prompt {
   background-color: #00B900; /* LINE green */
   color: white;
   text-align: center;
-  padding: 8px 16px;
+  overflow: hidden; /* Important for the grid animation */
 }
+/* --- END OF ADDED STYLES --- */
 
 .prompt-inner {
   max-width: 1200px;
@@ -111,6 +123,7 @@
   justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
+  padding: 8px 16px; /* Moved padding here */
 }
 
 .friend-prompt p {
@@ -188,6 +201,7 @@
   .prompt-inner {
     flex-direction: column;
     gap: 8px;
+    padding: 12px 16px; /* Adjust padding for mobile */
   }
   .friend-prompt p {
     font-size: 13px;
