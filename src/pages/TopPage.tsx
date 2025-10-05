@@ -78,6 +78,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   const [detailSuccessMessage, setDetailSuccessMessage] = useState<string | null>(null);
   const [isSubmittingDetail, setIsSubmittingDetail] = useState(false);
   const originalOverflowRef = useRef<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(5);
 
   // フィルター・ソート・検索のState
   const [searchQuery, setSearchQuery] = useState('');
@@ -258,6 +259,10 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     authManager.login();
   };
 
+  const handleLoadMore = () => {
+    setVisibleCount(prevCount => prevCount + 5);
+  };
+
   const handleSortChange = useCallback((key: SortOption, order: 'asc' | 'desc') => {
     setSort({ key, order });
 
@@ -429,18 +434,27 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
               {displayedCompanies.length === 0 ? (
                 <div className="no-results"><p>該当する企業が見つかりませんでした。</p></div>
               ) : (
-                <div className="companies-list">
-                  {displayedCompanies.map((company, index) => (
-                    <CompanyCard
-                      key={company.id}
-                      company={company}
-                      displayRank={index + 1}
-                      isRestricted={shouldLockContent}
-                      onViewDetails={handleCompanyDetailView}
-                      chartStats={chartStats}
-                    />
-                  ))}
-                </div>
+                <>
+                  <div className="companies-list">
+                    {displayedCompanies.slice(0, visibleCount).map((company, index) => (
+                      <CompanyCard
+                        key={company.id}
+                        company={company}
+                        displayRank={index + 1}
+                        isRestricted={shouldLockContent}
+                        onViewDetails={handleCompanyDetailView}
+                        chartStats={chartStats}
+                      />
+                    ))}
+                  </div>
+                  {visibleCount < displayedCompanies.length && (
+                    <div className="load-more-container">
+                      <button onClick={handleLoadMore} className="load-more-button">
+                        もっと表示する
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
 
               

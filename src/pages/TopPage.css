@@ -75,3 +75,26 @@
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
+
+.load-more-container {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.load-more-button {
+  padding: 12px 32px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.load-more-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
