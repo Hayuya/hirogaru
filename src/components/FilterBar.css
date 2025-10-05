@@ -19,6 +19,11 @@
   font-weight: 600;
   color: var(--text-secondary);
   margin: 0; /* Remove margin */
+  padding: 0 8px; /* Add horizontal padding */
+}
+
+.collapsible-wrapper {
+  padding-top: 12px;
 }
 
 /* --- Collapsible Section --- */
@@ -67,6 +72,7 @@
   letter-spacing: 0;
   color: var(--text-primary);
   font-size: 16px;
+  padding: 0;
 }
 
 .chevron {
