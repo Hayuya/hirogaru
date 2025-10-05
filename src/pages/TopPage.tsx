@@ -265,6 +265,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
 
   const handleSortChange = useCallback((key: SortOption, order: 'asc' | 'desc') => {
     setSort({ key, order });
+    setVisibleCount(5); // 表示件数をリセット
 
     if (!authState.lineUserId) return;
 
