@@ -162,14 +162,16 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <SearchIcon />
           <span>企業名で検索</span>
         </h3>
-        <div className="search-form">
-          <input
-            type="text"
-            placeholder={`${searchableCompanyCount}件の中から検索`}
-            value={searchQuery}
-            onChange={e => onSearchChange(e.target.value)}
-            className="search-input"
-          />
+        <div className="filter-card-content">
+          <div className="search-form">
+            <input
+              type="text"
+              placeholder={`${searchableCompanyCount}件の中から検索`}
+              value={searchQuery}
+              onChange={e => onSearchChange(e.target.value)}
+              className="search-input"
+            />
+          </div>
         </div>
       </div>
     </div>
