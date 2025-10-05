@@ -139,8 +139,6 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
 
   const attractionScore = company.attractionScore ?? 0;
 
-  const bonusInfo = [company.bonus_frequency_timing, company.bonus_previous_year_result].filter(Boolean).join(' / ');
-
   return (
     <div ref={cardRef} className={`company-card ${isRestricted ? 'restricted' : ''}`}>
       <div className="card-header">
@@ -232,7 +230,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
                 {company.revenue && company.revenue !== 'N/A' && <DetailItem label="売上高" value={company.revenue} />}
                 {company.starting_salary_graduates && company.starting_salary_graduates !== 'N/A' && <DetailItem label="初任給" value={company.starting_salary_graduates} />}
                 {isTruthy(company.fixed_overtime_system) && company.fixed_overtime_allowance && company.fixed_overtime_allowance !== 'N/A' && <DetailItem label="固定残業代" value={company.fixed_overtime_allowance} />}
-                {bonusInfo && bonusInfo !== 'N/A' && <DetailItem label="賞与" value={bonusInfo} />}
+                {company.bonus_frequency_timing && company.bonus_frequency_timing !== 'N/A' && <DetailItem label="賞与" value={company.bonus_frequency_timing} />}
                 {company.annual_holidays ? <DetailItem label="年間休日" value={`${company.annual_holidays}日`} /> : null}
                 {company.average_paid_leave_days ? <DetailItem label="平均有給取得日数" value={`${company.average_paid_leave_days}日`} /> : null}
                 {company.paid_leave_usage_rate ? <DetailItem label="有給休暇取得率" value={`${company.paid_leave_usage_rate}%`} /> : null}
