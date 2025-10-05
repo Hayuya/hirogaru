@@ -151,15 +151,16 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
           </div>
         </div>
 
-        {/* 常に「詳細を見る」ボタンを表示 */}
-        <button
-          className="expand-button"
-          onClick={toggleExpanded}
-          aria-expanded={isExpanded}
-        >
-          {isExpanded ? '詳細を閉じる' : '詳細を見る'}
-          <span className="expand-icon">{isExpanded ? '▲' : '▼'}</span>
-        </button>
+        {!isExpanded && (
+          <button
+            className="expand-button"
+            onClick={toggleExpanded}
+            aria-expanded={isExpanded}
+          >
+            詳細を見る
+            <span className="expand-icon">▼</span>
+          </button>
+        )}
 
         {isExpanded && (
           <div className="expanded-content">
@@ -233,6 +234,14 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
               </a>
             </div>
 
+            <button
+              className="expand-button close-button"
+              onClick={toggleExpanded}
+              aria-expanded={isExpanded}
+            >
+              詳細を閉じる
+              <span className="expand-icon">▲</span>
+            </button>
           </div>
         )}
       </div>

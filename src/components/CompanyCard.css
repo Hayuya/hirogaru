@@ -266,6 +266,7 @@
   display: flex;
   gap: 12px;
   margin-top: 24px;
+  margin-bottom: 16px; /* Added margin-bottom */
 }
 
 .action-button {
@@ -299,6 +300,10 @@
   background: var(--primary-light);
   color: var(--primary-color);
   text-decoration: none;
+}
+
+.close-button {
+  margin-top: 24px;
 }
 
 /* --- ADDED: Style for the chart login prompt --- */
