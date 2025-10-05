@@ -353,7 +353,7 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats, is
           />
 
           {/* ラベル */}
-          <text x={center} y={getPoint(angles.salary, labelRadius).y - 5} className="chart-label">給与</text>
+          <text x={center} y={getPoint(angles.salary, labelRadius).y - 5} className="chart-label">初任給</text>
           <text x={getPoint(angles.holidays, labelRadius).x} y={getPoint(angles.holidays, labelRadius).y} className="chart-label label-left">休日</text>
           <text x={getPoint(angles.employees, labelRadius).x} y={getPoint(angles.employees, labelRadius).y} className="chart-label label-right">規模</text>
 
