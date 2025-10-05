@@ -5,7 +5,7 @@
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 20px 0; /* 下の余白を削除 */
 }
 
 .triangle-chart-container {
@@ -162,7 +162,7 @@
 
 /* 魅力点表示 */
 .attraction-score {
-  margin-top: 16px;
+  margin-top: 0; /* 上の余白を削除 */
   padding: 10px 20px;
   background: #fafbfc;
   border: 1.5px solid #e5e7eb;
@@ -263,7 +263,7 @@
 @media (max-width: 768px) {
   .triangle-chart-wrapper {
     max-width: 320px;
-    padding: 16px;
+    padding: 16px 16px 0; /* 下の余白を削除 */
   }
 
   .chart-label {
@@ -283,7 +283,7 @@
   }
 
   .attraction-score {
-    margin-top: 12px;
+    margin-top: 0; /* 上の余白を削除 */
     padding: 8px 16px;
     gap: 12px;
   }
