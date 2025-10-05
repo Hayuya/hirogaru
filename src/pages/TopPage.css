@@ -98,3 +98,47 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
+
+/* ★★★ このブロックを追加 ★★★ */
+.line-user-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(31, 45, 61, 0.5); /* --text-primary with transparency */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.line-user-detail-panel {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.line-user-detail-panel h2 {
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.line-user-detail-panel .panel-message {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.line-user-detail-panel button {
+  margin-top: 24px;
+  padding: 10px 24px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+}
+/* ★★★ ここまで ★★★ */
