@@ -22,9 +22,11 @@ const formatValue = (value: string | number | null | undefined): string => {
 
 const formatPrefecture = (address: string): string => {
     if (!address || address === 'N/A') return '非公開';
-    const match = address.match(/^(.+?[都道府県])/);
-    return match ? match[1] : address;
-}
+    // 住所文字列から都道府県名のみを抽出する (例: "〒123-4567 広島県..." -> "広島県")
+    const match = address.match(/(北海道|.{2,3}[都道府県])/);
+    // マッチした部分 (例: '広島県') を返す。マッチしない場合は元の住所を返す。
+    return match ? match[0] : address;
+};
 
 const isTruthy = (value: any): boolean => {
     return String(value).toLowerCase() === 'true';
