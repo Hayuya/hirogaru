@@ -51,35 +51,6 @@ const formatGenderRatio = (ratioStr: string): string => {
   return `女性 ${femalePercentage.toFixed(1)}%`;
 };
 
-// Helper to count available welfare features
-const countWelfareFeatures = (company: Company): number => {
-  const features = [
-    company.housing_allowance,
-    company.remote_work,
-    company.flextime,
-    company.special_leave,
-    company.qualification_support,
-  ];
-  return features.filter(isTruthy).length;
-};
-
-// New component for the visual display
-const WelfareStatus: React.FC<{ count: number }> = ({ count }) => {
-  const getColorClass = (num: number) => {
-    if (num >= 4) return 'high';
-    if (num >= 2) return 'medium';
-    return 'low';
-  };
-
-  return (
-    <div className={`welfare-status ${getColorClass(count)}`}>
-      <span className="welfare-count">{count}</span>
-      <span className="welfare-total">/ 5個</span>
-      <span className="welfare-label">の制度あり</span>
-    </div>
-  );
-};
-
 const DetailItem: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div className="detail-item">
     <span className="detail-label">{label}</span>
@@ -246,7 +217,6 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
 
             <div className="detail-section">
               <h4 className="detail-title">働き方・制度</h4>
-              <WelfareStatus count={countWelfareFeatures(company)} />
               <div className="boolean-features-grid">
                   {isTruthy(company.housing_allowance) && <BooleanFeatureTag isAvailable={true} label="住宅手当" />}
                   {isTruthy(company.remote_work) && <BooleanFeatureTag isAvailable={true} label="リモートワーク" />}
