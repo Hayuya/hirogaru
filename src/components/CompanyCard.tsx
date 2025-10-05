@@ -30,26 +30,6 @@ const isTruthy = (value: any): boolean => {
     return String(value).toLowerCase() === 'true';
 }
 
-const parseNumericValue = (value: string | number | undefined | null): number => {
-  if (typeof value === 'number') return value;
-  if (!value) return 0;
-  const match = String(value).match(/[\d,.]+/);
-  return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
-};
-
-const calculateScore = (value: number, mean: number, stdDev: number): number => {
-  const zScore = stdDev === 0 ? 0 : (value - mean) / stdDev;
-  const clampedZ = Math.max(-1.5, Math.min(1.5, zScore));
-  const normalized = (clampedZ + 1.5) / 3;
-  return 20 + normalized * 80;
-};
-
-// Convert 0-100 score to 1-5 rating
-const scoreToRating = (score: number): number => {
-  return Math.min(5, Math.max(1, Math.round(score / 20)));
-};
-
-
 const formatGenderRatio = (ratioStr: string): string => {
   if (!ratioStr || ratioStr === "非公開" || ratioStr === "N/A") {
     return '非公開';
@@ -125,36 +105,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
     setIsExpanded(!isExpanded);
   };
 
-  // --- Attraction Score Calculation ---
-  const salaryValue = parseNumericValue(company.base_salary);
-  const employeesValue = company.number_of_employees;
-  const holidaysValue = company.annual_holidays;
-
-  const isPrivateSalary = salaryValue <= 0;
-  const isPrivateEmployees = employeesValue <= 0;
-  const isPrivateHolidays = holidaysValue <= 0;
-
-  const effectiveSalaryValue = isPrivateSalary ? chartStats.salary.mean : salaryValue;
-  const effectiveEmployeesValue = isPrivateEmployees ? Math.pow(10, chartStats.employees.mean) : employeesValue;
-  const effectiveHolidaysValue = isPrivateHolidays ? chartStats.holidays.mean : holidaysValue;
-
-  const scores = {
-    salary: isPrivateSalary ? 60 : calculateScore(effectiveSalaryValue, chartStats.salary.mean, chartStats.salary.stdDev),
-    employees: isPrivateEmployees ? 60 : calculateScore(Math.log10(effectiveEmployeesValue), chartStats.employees.mean, chartStats.employees.stdDev),
-    holidays: isPrivateHolidays ? 60 : calculateScore(effectiveHolidaysValue, chartStats.holidays.mean, chartStats.holidays.stdDev),
-  };
-
-  let ratings = {
-    salary: isPrivateSalary ? 2 : scoreToRating(scores.salary),
-    employees: isPrivateEmployees ? 2 : scoreToRating(scores.employees),
-    holidays: isPrivateHolidays ? 2 : scoreToRating(scores.holidays),
-  };
-
-  if (isRestricted) {
-    ratings = { salary: 4, holidays: 4, employees: 3 };
-  }
-
-  const attractionScore = ((ratings.salary + ratings.holidays + ratings.employees) / 3).toFixed(1);
+  const attractionScore = company.attractionScore ?? 0;
 
   return (
     <div className={`company-card ${isRestricted ? 'restricted' : ''}`}>
@@ -171,7 +122,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
             {!isRestricted && (
               <div className="rating">
                 <span className="rating-stars">★</span>
-                <span className="rating-value">{attractionScore} / 5.0</span>
+                <span className="rating-value">{attractionScore.toFixed(1)} / 5.0</span>
               </div>
             )}
           </div>

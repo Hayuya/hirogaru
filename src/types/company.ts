@@ -41,10 +41,12 @@ export interface Company {
   average_paid_leave_days: number | null;
   remote_work: boolean;
   flextime: boolean;
+  attractionScore?: number;
 }
 
 // ソート項目の定義
 export type SortOption =
+  | 'attractionScore'
   | 'starting_salary_graduates'
   | 'revenue'
   | 'number_of_employees'

@@ -14,8 +14,8 @@ import { logLineAction } from '../api/lineActionApi';
 import { type ChartStats } from '../components/TriangleChart';
 
 const SORT_LABEL_MAP: Record<SortOption, string> = {
+  attractionScore: '総合魅力度',
   starting_salary_graduates: '初任給',
-  base_salary: '基本給',
   revenue: '売上高',
   number_of_employees: '従業員数',
   average_overtime_hours: '残業時間',
@@ -53,6 +53,16 @@ const calculateStats = (data: number[]) => {
   return { mean, stdDev: stdDev === 0 ? 1 : stdDev }; // ゼロ除算を避ける
 };
 
+const calculateScore = (value: number, mean: number, stdDev: number): number => {
+    const zScore = stdDev === 0 ? 0 : (value - mean) / stdDev;
+    const clampedZ = Math.max(-1.5, Math.min(1.5, zScore));
+    const normalized = (clampedZ + 1.5) / 3;
+    return 20 + normalized * 80;
+};
+  
+const scoreToRating = (score: number): number => {
+    return Math.min(5, Math.max(1, Math.round(score / 20)));
+};
 
 interface TopPageProps {
   authState: AuthState;
@@ -81,7 +91,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     fixedOvertimeSystem: false,
   });
   const [sort, setSort] = useState<{ key: SortOption; order: 'asc' | 'desc' }>({
-    key: 'starting_salary_graduates',
+    key: 'attractionScore',
     order: 'desc',
   });
   const isDetailGateActive = detailState === 'loading' || detailState === 'show-form' || detailState === 'error';
@@ -176,8 +186,38 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
 
 
   // === データ加工処理 (useMemo) ===
+  const companiesWithScores = useMemo(() => {
+    if (!allCompanies.length || !chartStats) return [];
+
+    return allCompanies.map(company => {
+      const salaryValue = parseNumericValue(company.base_salary);
+      const employeesValue = company.number_of_employees;
+      const holidaysValue = company.annual_holidays;
+
+      const isPrivateSalary = salaryValue <= 0;
+      const isPrivateEmployees = employeesValue <= 0;
+      const isPrivateHolidays = holidaysValue <= 0;
+
+      const scores = {
+        salary: isPrivateSalary ? 60 : calculateScore(salaryValue, chartStats.salary.mean, chartStats.salary.stdDev),
+        employees: isPrivateEmployees ? 60 : calculateScore(Math.log10(employeesValue), chartStats.employees.mean, chartStats.employees.stdDev),
+        holidays: isPrivateHolidays ? 60 : calculateScore(holidaysValue, chartStats.holidays.mean, chartStats.holidays.stdDev),
+      };
+
+      const ratings = {
+        salary: isPrivateSalary ? 2 : scoreToRating(scores.salary),
+        employees: isPrivateEmployees ? 2 : scoreToRating(scores.employees),
+        holidays: isPrivateHolidays ? 2 : scoreToRating(scores.holidays),
+      };
+    
+      const attractionScore = parseFloat(((ratings.salary + ratings.holidays + ratings.employees) / 3).toFixed(1));
+
+      return { ...company, attractionScore };
+    });
+  }, [allCompanies, chartStats]);
+
   const filteredCompanies = useMemo(() => {
-    let processed = [...allCompanies];
+    let processed = [...companiesWithScores];
 
     // フィルター処理
     if (filters.selectedIndustries.length > 0) {
@@ -191,7 +231,7 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     if (filters.fixedOvertimeSystem) processed = processed.filter(c => !isTruthy(c.fixed_overtime_system));
 
     return processed;
-  }, [allCompanies, filters]);
+  }, [companiesWithScores, filters]);
   
   const displayedCompanies = useMemo(() => {
     let processed = [...filteredCompanies];
@@ -205,8 +245,8 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
   
     // ソート処理
     processed.sort((a, b) => {
-      const valA = parseNumericValue(a[sort.key]);
-      const valB = parseNumericValue(b[sort.key]);
+      const valA = sort.key === 'attractionScore' ? a.attractionScore ?? 0 : parseNumericValue(a[sort.key]);
+      const valB = sort.key === 'attractionScore' ? b.attractionScore ?? 0 : parseNumericValue(b[sort.key]);
       return sort.order === 'asc' ? valA - valB : valB - valA;
     });
   

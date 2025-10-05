@@ -16,6 +16,12 @@ const sortOptions: {
   ascLabel: string;
 }[] = [
   {
+    value: 'attractionScore',
+    label: '総合魅力度',
+    descLabel: '総合魅力度が高い順',
+    ascLabel: '総合魅力度が低い順',
+  },
+  {
     value: 'revenue',
     label: '売上高',
     descLabel: '売上高が高い順',
