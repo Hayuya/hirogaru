@@ -21,6 +21,8 @@ const SORT_LABEL_MAP: Record<SortOption, string> = {
   average_overtime_hours: '残業時間',
   average_years_of_service: '平均勤続年数',
   average_age: '平均年齢',
+  annual_holidays: '年間休日',
+  average_paid_leave_days: '平均有給取得日数',
 };
 
 const OTHER_FILTER_LABEL_MAP = {
@@ -38,7 +40,7 @@ const isTruthy = (value: any): boolean => {
 }
 
 // 文字列/数値から数値を確実に抽出するヘルパー関数
-const parseNumericValue = (value: string | number): number => {
+const parseNumericValue = (value: string | number | null | undefined): number => {
   if (typeof value === 'number') return value;
   if (!value) return 0;
   const match = String(value).match(/[\d,.]+/);
@@ -263,7 +265,8 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
     setVisibleCount(prevCount => prevCount + 5);
   };
 
-  const handleSortChange = useCallback((key: SortOption, order: 'asc' | 'desc') => {
+  const handleSortChange = useCallback((key: SortOption) => {
+    const order = key === 'average_overtime_hours' ? 'asc' : 'desc';
     setSort({ key, order });
     setVisibleCount(5); // 表示件数をリセット
 
@@ -405,7 +408,6 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
               />
               <SortBar
                 currentSort={sort.key}
-                sortOrder={sort.order}
                 totalCount={displayedCompanies.length}
                 onSortChange={handleSortChange}
               />
