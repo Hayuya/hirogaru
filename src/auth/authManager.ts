@@ -1,3 +1,5 @@
+// hayuya/hirogaru/hirogaru-f5678733641ee180489ca97b45eecb8b7a2b3e08/src/auth/authManager.ts
+
 import liff from '@line/liff';
 import type { AuthState } from '../types/auth';
 import { logLineAction } from '../api/lineActionApi';
@@ -31,7 +33,12 @@ class AuthManager {
     try {
       await liff.init({ liffId: LIFF_ID });
       
-      if (liff.isLoggedIn()) {
+      if (!liff.isLoggedIn()) {
+        // 未ログインの場合は自動でログインを開始
+        liff.login();
+        // ログイン処理でリダイレクトされるため、ここで処理を中断
+        // return new Promise(() => {}); // or handle as appropriate for your app flow
+      } else {
         this.authState.isLoggedIn = true;
         
         const [profile, friendship] = await Promise.all([
