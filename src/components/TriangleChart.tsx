@@ -144,9 +144,9 @@ export const TriangleChart: React.FC<TriangleChartProps> = ({ company, stats, is
 
   // 各ポイントの色
   const pointColors = {
-    salary: getRatingColor(ratings.salary),
-    holidays: getRatingColor(ratings.holidays),
-    employees: getRatingColor(ratings.employees)
+    salary: isPrivateSalary ? '#94A3B8' : getRatingColor(ratings.salary),
+    holidays: isPrivateHolidays ? '#94A3B8' : getRatingColor(ratings.holidays),
+    employees: isPrivateEmployees ? '#94A3B8' : getRatingColor(ratings.employees)
   };
 
   // スター表示用の配列作成
