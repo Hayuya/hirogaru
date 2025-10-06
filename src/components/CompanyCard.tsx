@@ -92,7 +92,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
         const scrollAmount = gapCenter - viewportCenter;
         
         // 瞬間移動（目標位置より少し下に移動）
-        const overshoot = 5; // オーバーシュート量（ピクセル）
+        const overshoot = -5; // オーバーシュート量（ピクセル）
         window.scrollBy({
           top: scrollAmount + overshoot,
           behavior: 'instant'
