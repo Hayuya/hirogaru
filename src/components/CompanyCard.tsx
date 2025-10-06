@@ -91,41 +91,9 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
         // How much to scroll to align the gap center with the viewport center.
         const scrollAmount = gapCenter - viewportCenter;
         
-        // 瞬間移動（目標位置より少し下に移動）
-        const overshoot = -5; // オーバーシュート量（ピクセル）
         window.scrollBy({
-          top: scrollAmount + overshoot,
-          behavior: 'instant'
+          top: scrollAmount,
         });
-        
-        // 微細な「余韻」アニメーション
-        setTimeout(() => {
-          // イージングアニメーションで最終位置へ
-          const startTime = performance.now();
-          const duration = 300; // アニメーション時間（ミリ秒）
-          
-          const animate = (currentTime: number) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            
-            // イージング関数（ease-out-cubic）
-            const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-            
-            // スクロール位置を調整
-            const currentScroll = window.scrollY;
-            const targetScroll = currentScroll - (overshoot * (1 - easeOutCubic));
-            window.scrollTo({
-              top: targetScroll,
-              behavior: 'instant'
-            });
-            
-            if (progress < 1) {
-              requestAnimationFrame(animate);
-            }
-          };
-          
-          requestAnimationFrame(animate);
-        }, 10); // 瞬間移動後、わずかに遅延してから余韻アニメーション開始
       }
     }
     // Update the wasExpanded ref for the next render.
@@ -133,7 +101,15 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
   }, [isExpanded]);
 
   const toggleExpanded = () => {
-    // 常に詳細の開閉を可能にする
+    // ★ 修正点: 閲覧が制限されている場合は詳細を開かず、下部の案内へスクロールさせる
+    if (isRestricted) {
+      const promptElement = document.getElementById('login-prompt');
+      if (promptElement) {
+        promptElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
     if (!isExpanded && onViewDetails) {
       onViewDetails(company);
     }
@@ -190,7 +166,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
             onClick={toggleExpanded}
             aria-expanded={isExpanded}
           >
-            詳細を見る
+            {isRestricted ? '詳細を見るには友達追加が必要です' : '詳細を見る'}
             <span className="expand-icon">▼</span>
           </button>
         )}

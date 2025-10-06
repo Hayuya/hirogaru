@@ -438,12 +438,13 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
             </div>
           )}
 
+          {/* ★ 修正点: ログイン済みだが友達でないユーザーへの案内を改善 */}
           {authState.isLoggedIn && !authState.isFriend && (
             <div className="registration-prompt">
               <div className="prompt-content">
-                <h3>すべての企業情報を見るには</h3>
-                <p>LINE公式アカウントを友ち追加し、そのLINEアカウントでログインしてください。すべての企業情報が閲覧可能になります。</p>
-                <a href="https://lin.ee/eiuBq0X" className="register-button" style={{ textDecoration: 'none' }}>
+                <h3>🚀 あと一歩です！</h3>
+                <p>全ての企業情報を閲覧するには、LINE公式アカウントの友だち追加が必要です。<br/>下のボタンから友だち追加後、このページを再読み込みしてください。</p>
+                <a href="https://lin.ee/eiuBq0X" className="add-friend-button-main" target="_blank" rel="noopener noreferrer">
                   LINEで友だち追加する
                 </a>
               </div>
@@ -521,12 +522,18 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                     ) : (
                       <>
                         <p>
-                          ログインありがとうございます。あと一歩です！
+                          ログインありがとうございます！
                           <br />
-                          現在ログイン中のLINEアカウントで、私たちの公式アカウントを友だち追加してください。
+                          全ての詳細情報を閲覧するには、LINE公式アカウントの友だち追加が必要です。
                           <br />
                           追加後、このページを再読み込み（リロード）すると、すべての情報が表示されます。
                         </p>
+                        {/* ★ 修正点: 友達追加ボタンを追加 */}
+                        <div className="prompt-buttons">
+                            <a href="https://lin.ee/eiuBq0X" className="add-friend-button-main" target="_blank" rel="noopener noreferrer">
+                                LINEで友だち追加する
+                            </a>
+                        </div>
                       </>
                     )}
                   </div>
