@@ -33,12 +33,13 @@ class AuthManager {
     try {
       await liff.init({ liffId: LIFF_ID });
       
-      if (!liff.isLoggedIn()) {
-        // 未ログインの場合は自動でログインを開始
+      // LINEアプリ内ブラウザで、かつ未ログインの場合のみ自動でログインを開始
+      if (liff.isInClient() && !liff.isLoggedIn()) {
         liff.login();
         // ログイン処理でリダイレクトされるため、ここで処理を中断
         // return new Promise(() => {}); // or handle as appropriate for your app flow
-      } else {
+      } else if (liff.isLoggedIn()) {
+        // ログイン済みの場合（ブラウザ問わず）はユーザー情報を取得
         this.authState.isLoggedIn = true;
         
         const [profile, friendship] = await Promise.all([
@@ -60,6 +61,7 @@ class AuthManager {
           this.isActionLogged = true; // 送信済みフラグを立てる
         }
       }
+      // 外部ブラウザで未ログインの場合は、何もせずそのまま未ログイン状態で初期化を完了
     } catch (error) {
       console.error('LIFF Error:', error);
       this.authState.error = 'LIFFの初期化に失敗しました。時間をおいて再度お試しください。';
