@@ -1,31 +1,37 @@
-/* UPDATED: Add padding to create space below the hero section */
+/* hayuya/hirogaru/hirogaru-f5678733641ee180489ca97b45eecb8b7a2b3e08/src/pages/TopPage.css */
+
 .main-content {
   padding-top: 40px;
 }
 
-.login-prompt {
+.login-prompt,
+.registration-prompt {
   margin: 40px 0;
-  padding: 40px;
+  padding: 32px 24px; /* ★ 修正点: 上下のパディングを調整 */
   background: var(--primary-light);
   border-radius: 16px;
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border-color);
 }
 
-.login-prompt .prompt-content {
-  text-align: center;
+.login-prompt .prompt-content,
+.registration-prompt .prompt-content {
+  text-align: center; /* ★ 修正点: コンテンツを中央揃え */
   color: var(--text-primary);
 }
 
-.login-prompt .prompt-content h3 {
+.login-prompt .prompt-content h3,
+.registration-prompt .prompt-content h3 {
   font-size: 24px;
   margin-bottom: 16px;
 }
 
-.login-prompt .prompt-content p {
+.login-prompt .prompt-content p,
+.registration-prompt .prompt-content p {
   font-size: 16px;
   margin-bottom: 24px;
   color: var(--text-secondary);
+  line-height: 1.7; /* ★ 追加: 行間を調整 */
 }
 
 .prompt-buttons {
@@ -35,7 +41,8 @@
   flex-wrap: wrap;
 }
 
-.add-friend-button-main {
+.add-friend-button-main,
+.register-button { /* ★ 修正点: register-buttonにもスタイルを適用 */
   padding: 12px 32px;
   background: #00C300;
   color: white;
@@ -50,7 +57,8 @@
   text-decoration: none;
 }
 
-.add-friend-button-main:hover {
+.add-friend-button-main:hover,
+.register-button:hover {
   background: #00B900;
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
