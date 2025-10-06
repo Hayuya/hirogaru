@@ -91,9 +91,41 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, isRestricted,
         // How much to scroll to align the gap center with the viewport center.
         const scrollAmount = gapCenter - viewportCenter;
         
+        // 瞬間移動（目標位置より少し下に移動）
+        const overshoot = 5; // オーバーシュート量（ピクセル）
         window.scrollBy({
-          top: scrollAmount,
+          top: scrollAmount + overshoot,
+          behavior: 'instant'
         });
+        
+        // 微細な「余韻」アニメーション
+        setTimeout(() => {
+          // イージングアニメーションで最終位置へ
+          const startTime = performance.now();
+          const duration = 300; // アニメーション時間（ミリ秒）
+          
+          const animate = (currentTime: number) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // イージング関数（ease-out-cubic）
+            const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+            
+            // スクロール位置を調整
+            const currentScroll = window.scrollY;
+            const targetScroll = currentScroll - (overshoot * (1 - easeOutCubic));
+            window.scrollTo({
+              top: targetScroll,
+              behavior: 'instant'
+            });
+            
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            }
+          };
+          
+          requestAnimationFrame(animate);
+        }, 10); // 瞬間移動後、わずかに遅延してから余韻アニメーション開始
       }
     }
     // Update the wasExpanded ref for the next render.
