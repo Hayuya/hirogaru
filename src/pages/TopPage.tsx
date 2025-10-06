@@ -474,11 +474,13 @@ export const TopPage: React.FC<TopPageProps> = ({ authState }) => {
                       />
                     ))}
                   </div>
-                  {visibleCount < displayedCompanies.length && (
+                  {displayedCompanies.length > 0 && (
                     <div className="load-more-container">
-                      <button onClick={handleLoadMore} className="load-more-button">
-                        さらに表示する
-                      </button>
+                      {visibleCount < displayedCompanies.length && (
+                        <button onClick={handleLoadMore} className="load-more-button">
+                          さらに表示する
+                        </button>
+                      )}
                       <button onClick={handleScrollToFilters} className="scroll-to-filters-button">
                         条件選択に戻る
                       </button>
